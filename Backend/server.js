@@ -18,6 +18,10 @@ app.use(cors());         // Enable Cross-Origin Resource Sharing
 // Mount routers
 app.use('/api', require('./routes/api'));
 
-const PORT = process.env.PORT || 5000;
+app.get('/',(req,res)=>{
+    res.send("Server is running");
+});
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT;
+
+app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}/`));
