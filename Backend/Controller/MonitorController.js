@@ -51,3 +51,104 @@ exports.getAlerts = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+
+
+//for testing
+
+// Create a new entity
+exports.createEntity = async (req, res) => {
+  try {
+    const { entityType, name, identifiers, department } = req.body;
+
+    // Simple validation
+    if (!entityType || !name) {
+      return res.status(400).json({ message: "entityType and name are required" });
+    }
+
+    const newEntity = new Entity({
+      entityType,
+      name,
+      identifiers,
+      department,
+    });
+
+    const savedEntity = await newEntity.save();
+    return res.status(201).json(savedEntity);
+  } catch (err) {
+    console.error("Error creating entity:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all entities
+exports.getAllEntities = async (req, res) => {
+  try {
+    const entities = await Entity.find();
+    return res.status(200).json(entities);
+  } catch (err) {
+    console.error("Error fetching entities:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Create a new event
+exports.createEvent = async (req, res) => {
+  try {
+    const { entityId, eventType, location, timestamp, metadata } = req.body;
+
+    // Basic validation
+    if (!entityId || !eventType || !location || !timestamp) {
+      return res.status(400).json({ message: "entityId, eventType, location, and timestamp are required" });
+    }
+
+    // Optional: check if entity exists
+    const entity = await Entity.findById(entityId);
+    if (!entity) {
+      return res.status(404).json({ message: "Entity not found" });
+    }
+
+    const newEvent = new Event({
+      entityId,
+      eventType,
+      location,
+      timestamp,
+      metadata,
+    });
+
+    const savedEvent = await newEvent.save();
+    return res.status(201).json(savedEvent);
+
+  } catch (err) {
+    console.error("Error creating event:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all events
+exports.getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find().populate("entityId");
+    return res.status(200).json(events);
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get events by entityId
+exports.getEventsByEntity = async (req, res) => {
+  try {
+    const { entityId } = req.params;
+
+    const entity = await Entity.findById(entityId);
+    if (!entity) return res.status(404).json({ message: "Entity not found" });
+
+    const events = await Event.find({ entityId }).sort({ timestamp: 1 }); // chronological
+    return res.status(200).json(events);
+
+  } catch (err) {
+    console.error("Error fetching events by entity:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
