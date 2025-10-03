@@ -45,20 +45,27 @@ const HomePage = () => {
 
       {/* Stats Section */}
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4">
-          <Users className="text-blue-600" size={36} />
-          <div>
-            <h2 className="text-lg font-semibold">Total Entities</h2>
-            <p className="text-gray-500">{entities.length}</p>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4">
-          <Bell className="text-red-500" size={36} />
-          <div>
-            <h2 className="text-lg font-semibold">Active Alerts</h2>
-            <p className="text-gray-500">{alerts.length}</p>
-          </div>
-        </div>
+        <Link to={"/entity"}>
+  <div className="group bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4 transition">
+    <Users className="text-blue-600" size={36} />
+    <div>
+      <h2 className="text-lg font-semibold group-hover:underline transition">Total Entities</h2>
+      <p className="text-gray-500">{entities.length}</p>
+    </div>
+  </div>
+</Link>
+
+<Link to={"/alerts"}>
+  <div className="group bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4 transition">
+    <Bell className="text-red-500" size={36} />
+    <div>
+      <h2 className="text-lg font-semibold group-hover:underline transition">Active Alerts</h2>
+      <p className="text-gray-500">{alerts.length}</p>
+    </div>
+  </div>
+</Link>
+
+       
         <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4">
           <Database className="text-green-600" size={36} />
           <div>

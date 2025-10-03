@@ -8,7 +8,7 @@ exports.getTimeline = async (req, res) => {
         const { entityId } = req.params;
         
         // Find all events for the given entity, sorted by time
-        const events = await Event.find({ entityId }).sort({ timestamp: 'asc' });
+        const events = await Event.find({ entityId }).sort({ timestamp: -1 });
         
         if (!events) {
             return res.status(404).json({ message: 'No events found for this entity.' });
