@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const EntitySchema = new mongoose.Schema({
     entityType: {
         type: String,
-        enum: ['student', 'staff', 'asset'],
+        enum: ['student', 'staff', 'asset','device'],
         required: true,
     },
     name: {
