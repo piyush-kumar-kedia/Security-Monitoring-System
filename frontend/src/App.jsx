@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AlertsPage from "./pages/AlertsPage";
 import TimelinePage from "./pages/TimelinePage";
+import EntitiesPage from "./pages/EntitiesPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/timeline/:entityId" element={<TimelinePage />} />
+        <Route path="/entity" element={<EntitiesPage />} />
       </Routes>
     </Router>
   );
