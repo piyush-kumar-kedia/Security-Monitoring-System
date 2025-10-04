@@ -7,19 +7,19 @@ from datetime import datetime
 
 # ---------- DATABASE CONFIG ----------
 DB_MAIN = {
-    "dbname": "ethos",
-    "user": "p_2626",
-    "password": "1234",
+    "dbname": "entity_data",
+    "user": "postgres",
+    "password": "Jayansh@1523",
     "host": "localhost",
-    "port": "2626"
+    "port": "5432"
 }
 
 DB_IMAGES = {
-    "dbname": "ethos_images",
-    "user": "p_2626",
-    "password": "1234",
+    "dbname": "face_images",
+    "user": "postgres",
+    "password": "Jayansh@1523",
     "host": "localhost",
-    "port": "2626"
+    "port": "5432"
 }
 
 OUTPUT_DIR = "output"

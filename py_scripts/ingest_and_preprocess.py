@@ -4,11 +4,11 @@ import pandas as pd
 from datetime import datetime
 from glob import glob
 DB_CONFIG = {
-    'host': 'postgres',
-    'port': 2626,
+    'host': 'localhost',
+    'port': 5432,
     'user': 'postgres',
-    'password': '1234',
-    'database': 'ethos'
+    'password': 'Jayansh@1523',
+    'database': 'entity_data'
 }
 
 DATA_UPLOAD_DIR = 'data_upload'

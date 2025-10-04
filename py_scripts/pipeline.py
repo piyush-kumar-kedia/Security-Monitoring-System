@@ -2,10 +2,10 @@ import subprocess
 import sys
 import os
 
-DB_USER = "p_2626"
-DB_PASS = "1234"
+DB_USER = "postgres"
+DB_PASS = "Jayansh@1523"
 DB_HOST = "localhost"
-DB_PORT = "2626"
+DB_PORT = "5432"
 
 def run_python(script):
     print(f"\nRunning {script} ...")
@@ -40,7 +40,7 @@ def run_psql(database, sql_file):
 def main():
     run_python("profile_preprocess.py")
     run_python("ingest_and_preprocess.py")
-    run_psql("ethos", "create_tables.sql")
+    run_psql("entity_data", "create_tables.sql")
     print("\nEnsuring ethos_images database exists ...")
     subprocess.run(
         [
@@ -49,7 +49,7 @@ def main():
         ],
         env={**os.environ, "PGPASSWORD": DB_PASS}
     )
-    run_psql("ethos_images", "create_images_table.sql")
+    run_psql("face_images", "create_images_table.sql")
     run_python("db_insert.py")
     run_python("ingest_face_images.py")
 

@@ -4,10 +4,10 @@ import pandas as pd
 
 DB_CONFIG = {
     'host': 'localhost',
-    'port': 2626,
-    'user': 'p_2626',
-    'password': '1234',
-    'database': 'ethos'
+    'port': 5432,
+    'user': 'postgres',
+    'password': 'Jayansh@1523',
+    'database': 'entity_data'
 }
 
 DATA_DIR = 'data'
