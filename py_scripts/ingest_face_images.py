@@ -7,10 +7,10 @@ DATA_FACE_IMAGES_DIR = os.path.join('data', 'face_images')
 
 DB_CONFIG = {
     'host': 'localhost',
-    'port': 2626,
-    'user': 'p_2626',
-    'password': '1234', 
-    'database': 'ethos_images'
+    'port': 5432,
+    'user': 'postgres',
+    'password': 'Jayansh@1523', 
+    'database': 'face_images'
 }
 
 os.makedirs(DATA_FACE_IMAGES_DIR, exist_ok=True)

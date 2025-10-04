@@ -1,1 +1,4 @@
 .env
+py_scripts/data
+py_scripts/data_upload
+py_scripts/output
