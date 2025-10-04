@@ -16,11 +16,12 @@ def get_timeline(name, department, start_time, end_time):
     try:
         # Connect to the database
         conn = psycopg2.connect(
-            dbname=DB_CONFIG['dbname'],
-            user=DB_CONFIG['user'],
-            password=DB_CONFIG['password'],
-            host=DB_CONFIG['host'],
-            port=DB_CONFIG['port']
+            # dbname=DB_CONFIG['dbname'],
+            # user=DB_CONFIG['user'],
+            # password=DB_CONFIG['password'],
+            # host=DB_CONFIG['host'],
+            # port=DB_CONFIG['port']
+            "postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres"
         )
         cursor = conn.cursor()
 

@@ -36,10 +36,10 @@ TABLES = {
 
 # ---------- CONNECTIONS ----------
 def connect_main():
-    return psycopg2.connect(**DB_MAIN)
+    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
 
 def connect_images():
-    return psycopg2.connect(**DB_IMAGES)
+    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
 
 # ---------- OUTPUT FOLDER ----------
 def clear_output_folder():
