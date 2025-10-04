@@ -17,11 +17,12 @@ os.makedirs(DATA_FACE_IMAGES_DIR, exist_ok=True)
 
 def get_connection():
     return psycopg2.connect(
-        host=DB_CONFIG['host'],
-        port=DB_CONFIG['port'],
-        user=DB_CONFIG['user'],
-        password=DB_CONFIG['password'],
-        database=DB_CONFIG['database']
+        # host=DB_CONFIG['host'],
+        # port=DB_CONFIG['port'],
+        # user=DB_CONFIG['user'],
+        # password=DB_CONFIG['password'],
+        # database=DB_CONFIG['database']
+        "postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres"
     )
 
 def ingest_images():
