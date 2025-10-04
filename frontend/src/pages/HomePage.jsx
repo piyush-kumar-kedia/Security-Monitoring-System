@@ -2,11 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Bell, Users, Database, Activity } from "lucide-react"; // modern icons
+import { Bell, Users, Database, Menu, X } from "lucide-react"; // modern icons
+import HomePageSkeleton from "./HomePageSkeleton";
 
 const HomePage = () => {
   const [entities, setEntities] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,24 +29,53 @@ const HomePage = () => {
       } catch (err) {
         console.error(err);
       }
+      finally{
+        setLoading(false); // Set loading to false after data is fetched or on error
+      }
     };
 
     fetchEntities();
     fetchAlerts();
   }, []);
 
+  const navbarHeight = 'pt-16'; 
+  const mobileMenuTop = 'top-16';
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+      <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
         <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
-        <div className="flex gap-6">
+        {/* Desktop Menu */}
+        <div className="hidden md:flex gap-6">
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/alerts" className="hover:underline">Alerts</Link>
+          <Link to="/entities" className="hover:underline">Entities</Link>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
       </nav>
 
+      {/* Mobile Menu (Dropdown) */}
+      {isMenuOpen && (
+        <div className={`md:hidden bg-blue-700 text-white p-4 fixed w-full z-40 ${mobileMenuTop}`}>
+          <Link to="/" className="block py-2 px-3 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Home</Link>
+          <Link to="/alerts" className="block py-2 px-3 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Alerts</Link>
+          <Link to="/entities" className="block py-2 px-3 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Entities</Link>
+        </div>
+      )}
+
+      <main className={navbarHeight}>
       {/* Stats Section */}
+      {loading ? (
+          <HomePageSkeleton />
+        ) : (
+    <>
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg flex items-center gap-4">
           <Users className="text-blue-600" size={36} />
@@ -117,6 +149,8 @@ const HomePage = () => {
           ))}
         </div>
       </div>
+      </>)}
+      </main>
     </div>
   );
 };
