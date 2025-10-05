@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getTimeline, getAlerts, createEntity, getAllEntities, createEvent, getAllEvents, getEventsByEntity } = require('../Controller/MonitorController.js');
+const { getTimeline, getAlerts, createEntity, getAllEntities, createEvent, getAllEvents, getEventsByEntity, runPythonScript } = require('../Controller/MonitorController.js');
 
 // Define the routes
 router.get('/timeline/:entityId', getTimeline);
 router.get('/alerts', getAlerts);
+router.post("/run-script", runPythonScript);
 
 //for testing
 router.get('/entity',getAllEntities);
