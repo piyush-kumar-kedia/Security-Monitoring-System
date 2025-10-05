@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+//import "react-datepicker/dist/react-datepicker.css";
 
 const EntitiesPage = () => {
   const [entities, setEntities] = useState([]);
@@ -19,6 +19,7 @@ const EntitiesPage = () => {
   useEffect(() => {
     const fetchEntities = async () => {
       try {
+        console.log("Fetching entities...");
         const res = await axios.get("http://localhost:5000/api/entity");
         setEntities(res.data);
       } catch (err) {
@@ -43,8 +44,8 @@ const EntitiesPage = () => {
 
   const filteredEntities = entities.filter((entity) => {
     if (searchName && !(entity.name?.toLowerCase().includes(searchName.toLowerCase()))) return false;
-    if (searchRoll && !(entity.identifiers?.studentId?.toString().includes(searchRoll))) return false;
-    if (categoryFilter && entity.entityType !== categoryFilter) return false;
+    if (searchRoll && !(entity.card_id.includes(searchRoll))) return false;
+    if (categoryFilter && entity.role !== categoryFilter) return false;
 
     if (startDate || endDate) {
       const timeline = timelines[entity._id] || [];
@@ -165,36 +166,35 @@ const EntitiesPage = () => {
             {currentEntities.length > 0 ? (
               currentEntities.map((entity, idx) => (
                 <tr
-  key={entity._id}
-  className={`${idx % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition`}
->
-  <td className="p-3 border-b border-gray-200 text-gray-900 font-medium">{entity.name || "-"}</td>
+                  key={entity._id}
+                  className={`${idx % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition`}
+                >
+                  <td className="p-3 border-b border-gray-200 text-gray-900 font-medium">{entity.name || "-"}</td>
 
-  <td className="p-3 border-b border-gray-200 text-gray-700">
-    {entity.entityType === "student"
-      ? entity.identifiers?.studentId || "-"
-      : entity.identifiers?.cardId || "-"}
-  </td>
+                  <td className="p-3 border-b border-gray-200 text-gray-700">
+                    {entity.role === "student"
+                      ? entity.student_id || "-"
+                      : entity.card_id || "-"}
+                  </td>
 
-  <td className="p-3 border-b border-gray-200">
-    <span
-      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-        entityColors[entity.entityType] || "bg-gray-100 text-gray-800"
-      }`}
-    >
-      {entity.entityType || "-"}
-    </span>
-  </td>
+                  <td className="p-3 border-b border-gray-200">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${entityColors[entity.role] || "bg-gray-100 text-gray-800"
+                        }`}
+                    >
+                      {entity.role || "-"}
+                    </span>
+                  </td>
 
-  <td className="p-3 border-b border-gray-200 text-center">
-    <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium shadow-sm"
-      onClick={() => navigate(`/timeline/${entity._id}`)}
-    >
-      View Timeline →
-    </button>
-  </td>
-</tr>
+                  <td className="p-3 border-b border-gray-200 text-center">
+                    <button
+                      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium shadow-sm"
+                      onClick={() => navigate(`/timeline/${entity.card_id}`)}
+                    >
+                      View Timeline →
+                    </button>
+                  </td>
+                </tr>
 
               ))
             ) : (
@@ -215,11 +215,10 @@ const EntitiesPage = () => {
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
-                page === currentPage
+              className={`px-4 py-2 rounded-lg font-medium transition ${page === currentPage
                   ? "bg-blue-500 text-white"
                   : "border bg-white text-gray-700 hover:bg-gray-100"
-              }`}
+                }`}
             >
               {page}
             </button>

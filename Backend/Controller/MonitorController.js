@@ -1,5 +1,7 @@
-const Entity = require('../Models/Entity');
-const Event = require('../Models/Event');
+// const Entity = require('../Models/Entity');
+// const Event = require('../Models/Event');
+const pool = require('../config/db');
+const axios = require('axios');
 
 // @desc    Get the complete timeline for a specific entity
 // @route   GET /api/timeline/:entityId
@@ -83,8 +85,9 @@ exports.createEntity = async (req, res) => {
 // Get all entities
 exports.getAllEntities = async (req, res) => {
   try {
-    const entities = await Entity.find();
-    return res.status(200).json(entities);
+    console.log("Fetching from pool");
+    const entities = await pool.query("SELECT * FROM student_or_staff_profiles");
+    return res.status(200).json(entities.rows);
   } catch (err) {
     console.error("Error fetching entities:", err);
     return res.status(500).json({ message: "Server error" });
@@ -150,5 +153,29 @@ exports.getEventsByEntity = async (req, res) => {
   } catch (err) {
     console.error("Error fetching events by entity:", err);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+exports.runPythonScript = async (req, res) => {
+  const { entityId } = req.body;
+
+  try {
+    console.log("Calling FastAPI for entityId:", entityId);
+    const response = await axios.post("http://127.0.0.1:8000/run-query", {
+      identifier_type: 'card_id',
+      identifier_value: entityId,
+      start_time: '',
+      end_time: '',
+      location: ''
+    });
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error calling FastAPI:", error.message);
+    res.status(500).json({
+      message: "Error running Python script",
+      error: error.message
+    });
   }
 };
