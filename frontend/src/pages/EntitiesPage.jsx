@@ -19,6 +19,7 @@ const EntitiesPage = () => {
   useEffect(() => {
     const fetchEntities = async () => {
       try {
+        console.log("Fetching entities...");
         const res = await axios.get("http://localhost:5000/api/entity");
         setEntities(res.data);
       } catch (err) {
@@ -43,8 +44,8 @@ const EntitiesPage = () => {
 
   const filteredEntities = entities.filter((entity) => {
     if (searchName && !(entity.name?.toLowerCase().includes(searchName.toLowerCase()))) return false;
-    if (searchRoll && !(entity.identifiers?.studentId?.toString().includes(searchRoll))) return false;
-    if (categoryFilter && entity.entityType !== categoryFilter) return false;
+    if (searchRoll && !(entity.card_id.includes(searchRoll))) return false;
+    if (categoryFilter && entity.role !== categoryFilter) return false;
 
     if (startDate || endDate) {
       const timeline = timelines[entity._id] || [];
@@ -171,7 +172,7 @@ const EntitiesPage = () => {
                   <td className="p-3 border-b border-gray-200 text-gray-900 font-medium">{entity.name || "-"}</td>
 
                   <td className="p-3 border-b border-gray-200 text-gray-700">
-                    {entity.entityType === "student"
+                    {entity.role === "student"
                       ? entity.student_id || "-"
                       : entity.card_id || "-"}
                   </td>
@@ -188,7 +189,7 @@ const EntitiesPage = () => {
                   <td className="p-3 border-b border-gray-200 text-center">
                     <button
                       className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium shadow-sm"
-                      onClick={() => navigate(`/timeline/${entity._id}`)}
+                      onClick={() => navigate(`/timeline/${entity.card_id}`)}
                     >
                       View Timeline →
                     </button>
