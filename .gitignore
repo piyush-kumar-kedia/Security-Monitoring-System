@@ -1,1 +1,9 @@
 .env
+py_scripts/data
+py_scripts/data_upload
+py_scripts/output
+py_scripts/__pycache__
+frontend/node_modules
+frontend/.env
+Backend/.env
+Backend/node_modules

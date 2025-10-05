@@ -4,22 +4,23 @@ import os
 import shutil
 import glob
 from datetime import datetime
+import numpy as np
 
 # ---------- DATABASE CONFIG ----------
 DB_MAIN = {
-    "dbname": "ethos",
-    "user": "p_2626",
-    "password": "1234",
+    "dbname": "entity_data",
+    "user": "postgres",
+    "password": "",
     "host": "localhost",
-    "port": "2626"
+    "port": "5432"
 }
 
 DB_IMAGES = {
-    "dbname": "ethos_images",
-    "user": "p_2626",
-    "password": "1234",
+    "dbname": "face_images",
+    "user": "postgres",
+    "password": "",
     "host": "localhost",
-    "port": "2626"
+    "port": "5432"
 }
 
 OUTPUT_DIR = "output"
@@ -36,10 +37,10 @@ TABLES = {
 
 # ---------- CONNECTIONS ----------
 def connect_main():
-    return psycopg2.connect(**DB_MAIN)
+    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
 
 def connect_images():
-    return psycopg2.connect(**DB_IMAGES)
+    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
 
 # ---------- OUTPUT FOLDER ----------
 def clear_output_folder():
@@ -231,6 +232,7 @@ def build_timeline(entity_dir, entity_id, conn_main):
                     "name": names,
                     "summary": f"Card {row.get('card_id')} (used by {names}) swiped at {row.get('location_id')} on {row.get('timestamp')}"
                 })
+    
 
     timeline_df = pd.DataFrame(timeline_records, columns=schema)
     timeline_df["timeline_timestamp"] = pd.to_datetime(
@@ -241,6 +243,13 @@ def build_timeline(entity_dir, entity_id, conn_main):
     out_path = os.path.join(entity_dir, f"entity_{entity_id}_timeline.csv")
     timeline_df.to_csv(out_path, index=False)
     print(f"Timeline saved: {out_path}")
+    # timeline_df is your DataFrame
+    timeline_df = timeline_df.replace({np.nan: None, np.inf: None, -np.inf: None})
+
+    # Convert to list of dicts for JSON
+    timeline_list = timeline_df.to_dict(orient="records")
+    return timeline_list
+
 
 # ---------- MAIN QUERY FUNCTION ----------
 def query_entity(user_input):
@@ -283,11 +292,12 @@ def query_entity(user_input):
             print(f"Saved {len(df)} rows from {table}")
 
     save_images(entity_id, entity_dir)
-    build_timeline(entity_dir, entity_id, conn_main)
+    timeline_dict = build_timeline(entity_dir, entity_id, conn_main)
 
     cur_main.close()
     conn_main.close()
     print(f"Finished. Data + timeline saved in {entity_dir}")
+    return timeline_dict
 
 # ---------- MAIN ----------
 if __name__ == "__main__":

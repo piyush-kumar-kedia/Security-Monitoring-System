@@ -14,9 +14,8 @@ const TimelinePage = () => {
     const fetchTimeline = async () => {
       try {
         // Fetch timeline
-        const resTimeline = await axios.get(
-          `http://localhost:5000/api/timeline/${entityId}`
-        );
+        console.log("Fetching timeline for entityId fend:", entityId);
+        const resTimeline = await axios.post("http://localhost:5000/api/run-script", { entityId });
         setTimeline(resTimeline.data.timeline);
 
         // Fetch entity details
@@ -41,7 +40,7 @@ const TimelinePage = () => {
         </h1>
         <p className="text-gray-600 mb-6">
           Detailed chronological activity log for{" "}
-          <span className="font-semibold">{entity?.entityType || "this entity"}</span>.
+          <span className="font-semibold">{entity?.role || "this entity"}</span>.
         </p>
 
         {/* Timeline */}
@@ -53,17 +52,17 @@ const TimelinePage = () => {
           <div className="space-y-6">
             {timeline.map((event, index) => (
               <div
-                key={event._id || index}
+                key={event.event_id || index}
                 className="bg-white rounded-lg shadow p-5 hover:shadow-md border-l-4 border-blue-500"
               >
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {event.eventType.replace("_", " ").toUpperCase()}
+                  {event.source.replace("_", " ").toUpperCase()}
                 </h3>
                 <p className="text-gray-600">
-                  {event.metadata?.details || "No extra details"}
+                  {event.summary || "No extra details"}
                 </p>
                 <p className="text-gray-500 text-sm mt-2">
-                  📍 {event.location} <br />
+                  📍 {event.location_id} <br />
                   ⏰ {new Date(event.timestamp).toLocaleString()}
                 </p>
               </div>
