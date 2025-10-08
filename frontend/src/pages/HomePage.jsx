@@ -75,7 +75,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Alerts Section */}
+      {/* Alert Section */}
       <div className="p-6">
         <h2 className="text-xl font-bold text-red-600 mb-4">🚨 Inactive Entities</h2>
         {alerts.length === 0 ? (
