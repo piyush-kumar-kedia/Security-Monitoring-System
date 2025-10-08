@@ -12,7 +12,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/timeline/:entityId" element={<TimelinePage />} />
-        <Route path="/entity" element={<EntitiesPage />} />
+        <Route path="/entities" element={<EntitiesPage />} />
       </Routes>
     </Router>
   );
