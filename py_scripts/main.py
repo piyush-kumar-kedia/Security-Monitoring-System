@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from get_info import query_entity  # your logic file
+from get_info import query_entity , entity_details # your logic file
 import uvicorn
 
 app = FastAPI()
@@ -22,6 +22,19 @@ def run_query(input: QueryInput):
     }
     result = query_entity(user_input)
     return {"status": "success", "timeline": result}
+
+@app.post("/details")
+def details(input: QueryInput):
+    user_input = {
+        "identifier": {input.identifier_type: input.identifier_value},
+    }
+    result = entity_details(user_input)
+    return {"status": "success", "details": result}
+
+# @app.get("/predict/{entity_id}")
+# def predict(entity_id: str):
+#     result = predict_entity(entity_id)
+#     return result
 
 if __name__ == "__main__":
     import uvicorn
