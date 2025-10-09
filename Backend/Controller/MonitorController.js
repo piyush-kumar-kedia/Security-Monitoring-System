@@ -179,3 +179,44 @@ exports.runPythonScript = async (req, res) => {
     });
   }
 };
+
+exports.getEntity = async(req, res)=>{
+  const {entityId} = req.params;
+
+  try {
+    console.log("Calling FastAPI getDetails for entityId:", entityId);
+    const response = await axios.post("http://127.0.0.1:8000/details", {
+      identifier_type: 'card_id',
+      identifier_value: entityId,
+      start_time: '',
+      end_time: '',
+      location: ''
+    });
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error calling FastAPI:", error.message);
+    res.status(500).json({
+      message: "Error running Python script",
+      error: error.message
+    });
+  }
+};
+
+
+exports.predict = async(req, res)=>{
+  const {entityId} = req.params;
+
+  try {
+    console.log("Calling FastAPI getDetails for pred:", entityId);
+    const response = await axios.get(`http://127.0.0.1:8000/predict/${entity_id}`);
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error calling FastAPI:", error.message);
+    res.status(500).json({
+      message: "Error running Python script",
+      error: error.message
+    });
+  }
+};

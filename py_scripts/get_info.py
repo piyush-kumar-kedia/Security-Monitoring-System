@@ -37,10 +37,26 @@ TABLES = {
 
 # ---------- CONNECTIONS ----------
 def connect_main():
-    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
+    # return psycopg2.connect("postgresql://postgres:ethos_prod@db.tlruewxqrjvkyypmsbfg.supabase.co:5432/postgres")
+    db_config = {
+        'host': 'localhost',
+        'port': 5432,
+        'user': 'postgres',
+        'password': 'Jayansh@1523',
+        'database': 'entity_data'
+    }
+    return psycopg2.connect(**db_config)
 
 def connect_images():
-    return psycopg2.connect("postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres")
+    #return psycopg2.connect("postgresql://postgres:ethos_prod@db.tlruewxqrjvkyypmsbfg.supabase.co:5432/postgres")
+    db_config = {
+        'host': 'localhost',
+        'port': 5432,
+        'user': 'postgres',
+        'password': 'Jayansh@1523',
+        'database': 'entity_data'
+    }
+    return psycopg2.connect(**db_config)
 
 # ---------- OUTPUT FOLDER ----------
 def clear_output_folder():
@@ -252,6 +268,19 @@ def build_timeline(entity_dir, entity_id, conn_main):
 
 
 # ---------- MAIN QUERY FUNCTION ----------
+
+def entity_details(user_input):
+    conn_main = connect_main()
+    cur_main = conn_main.cursor()
+
+    resolved = resolve_entity(cur_main, user_input["identifier"])
+    if not resolved:
+        print("Entity not found")
+        return
+    return resolved
+    
+    
+
 def query_entity(user_input):
     conn_main = connect_main()
     cur_main = conn_main.cursor()
