@@ -125,7 +125,7 @@ const HomePage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
-        <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
+        <h1 className="text-2xl font-bold">Campus Security-Monitoring-System</h1>
 
         <div className="hidden md:flex gap-6">
           <button
