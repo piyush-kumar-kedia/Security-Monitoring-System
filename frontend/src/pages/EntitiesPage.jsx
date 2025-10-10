@@ -95,13 +95,6 @@ const totalPages = Math.ceil(filteredEntities.length / entitiesPerPage);
 
 const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-// useEffect(() => {
-//   currentEntities.forEach((entity) => {
-//     if (!timelines[entity.card_id]) fetchTimeline(entity.card_id);
-//   });
-//   console.log('timeline: ', timelines);
-// }, [currentEntities]);
-
 const entityConfig = {
   student: {
     color: "bg-blue-500",
@@ -160,7 +153,7 @@ const handleLogout = async () => {
 return (
   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
     <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
-        <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
+        <h1 className="text-2xl font-bold">Campus Security-Monitoring-System</h1>
 
         <div className="hidden md:flex gap-6">
           <button
@@ -329,9 +322,7 @@ return (
 
                       <td className="px-6 py-4">
                         <p className="font-mono text-sm font-medium text-gray-700">
-                          {/* {entity.role === "student"
-                              ? entity.student_id || "-"
-                              : entity.card_id || "-"} */}
+                          
                           {entity.card_id || '-'}
                         </p>
                       </td>

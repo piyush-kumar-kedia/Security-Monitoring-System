@@ -8,7 +8,7 @@ const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // toggle password
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,10 +19,9 @@ const Login = () => {
     setLoading(true);
     setMessage("");
     try {
-      await loginUser(form); // JWT cookie set automatically by backend
-      setMessage("✅ Login successful! Redirecting...");
+      await loginUser(form);
+      setMessage("Login successful! Redirecting...");
 
-      // Redirect to home after 1 second
       setTimeout(() => {
         navigate("/");
       }, 1000);
@@ -37,7 +36,7 @@ const Login = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-          🔑 Login
+          Login
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
