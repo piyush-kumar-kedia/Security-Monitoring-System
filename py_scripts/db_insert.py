@@ -1,14 +1,10 @@
 import os
 import psycopg2
 import pandas as pd
+from dotenv import load_dotenv
 
-DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5432,
-    'user': 'postgres',
-    'password': 'Jayansh@1523',
-    'database': 'entity_data'
-}
+load_dotenv()
+
 
 DATA_DIR = 'data'
 
@@ -30,14 +26,14 @@ COLUMN_RENAMES = {
 }
 
 def get_connection():
-    return psycopg2.connect(
-        # host=DB_CONFIG['host'],
-        # port=DB_CONFIG['port'],
-        # user=DB_CONFIG['user'],
-        # password=DB_CONFIG['password'],
-        # database=DB_CONFIG['database']
-        "postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres"
-    )
+    db_config = {
+        'host': os.getenv("DB_MAIN_HOST"),
+        'port': os.getenv("DB_MAIN_PORT"),
+        'user': os.getenv("DB_MAIN_USER"),
+        'password': os.getenv("DB_MAIN_PASSWORD"),
+        'database': os.getenv("DB_MAIN_NAME")
+    }
+    return psycopg2.connect(**db_config)
 
 def insert_dataframe(df, table_name, conn):
     cols = ','.join(df.columns)
