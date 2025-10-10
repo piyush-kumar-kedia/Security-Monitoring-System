@@ -23,7 +23,7 @@ const HomePage = () => {
 
     const fetchAlerts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/alerts");
+        const res = await axios.get("http://localhost:5000/api/alerts/inactive");
         setAlerts(res.data.alerts);
       } catch (err) {
         console.error(err);
@@ -33,6 +33,20 @@ const HomePage = () => {
     fetchEntities();
     fetchAlerts();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchAlerts = async () => {
+  //     try {
+  //       const res = await axios.get("http://localhost:5000/api/alerts/inactive");
+  //       setAlerts(res.data.alerts);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchAlerts();
+  // }, []);
+
 
   const filteredEntities = entities.filter(entity => {
     const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -127,57 +141,41 @@ const HomePage = () => {
         </div>
 
         {/* Alerts Section */}
-        {alerts.length > 0 && (
-          <div className="mb-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <AlertTriangle className="text-red-600" size={28} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">Inactive Entities</h2>
-                <p className="text-gray-600">Entities requiring immediate attention</p>
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {alerts.map((entity) => (
-                <div
-                  key={entity._id}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-l-4 border-red-500 group"
-                >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="p-3 bg-red-50 rounded-lg">
-                        <Bell className="text-red-600" size={24} />
-                      </div>
-                      <span className="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-semibold">
-                        INACTIVE
-                      </span>
+        {/* {alerts.length > 0 && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {alerts.map((entity) => (
+              <div
+                key={entity.entity_id}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-l-4 border-red-500 group"
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 bg-red-50 rounded-lg">
+                      <Bell className="text-red-600" size={24} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{entity.name}</h3>
-                    <div className="space-y-1 mb-4">
-                      <p className="text-gray-600 text-sm">
-                        <span className="font-medium">Type:</span> {entity.entityType}
-                      </p>
-                      <p className="text-gray-600 text-sm">
-                        <span className="font-medium">Dept:</span> {entity.department || "Not specified"}
-                      </p>
-                    </div>
-                    <button
-                      className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 group-hover:gap-3 transition-all"
-                      onClick={() => navigate(`/timeline/${entity.card_id}`)}
-                    >
-                      View Timeline
-                      <ChevronRight size={18} />
-                    </button>
+                    <span className="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-semibold">
+                      INACTIVE
+                    </span>
                   </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{entity.name}</h3>
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-medium">Last Activity:</span> {entity.last_activity || "No records"}
+                  </p>
+                  <button
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 group-hover:gap-3 transition-all mt-4"
+                    onClick={() => navigate(`/timeline/${entity.entity_id}`)}
+                  >
+                    View Timeline
+                    <ChevronRight size={18} />
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        )} */}
 
-        {alerts.length === 0 && (
+
+        {/* {alerts.length === 0 && (
           <div className="mb-10 bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-2xl border-2 border-green-200">
             <div className="flex items-center gap-4">
               <div className="p-4 bg-green-100 rounded-full">
@@ -189,10 +187,10 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Search and Filter Section */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Users className="text-blue-600" size={28} />
@@ -230,10 +228,10 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Entities Grid */}
-        {filteredEntities.length === 0 ? (
+        {/* {filteredEntities.length === 0 ? (
           <div className="bg-white p-12 rounded-2xl shadow-md text-center">
             <div className="text-gray-300 mb-4">
               <Users size={64} className="mx-auto" />
@@ -283,7 +281,7 @@ const HomePage = () => {
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

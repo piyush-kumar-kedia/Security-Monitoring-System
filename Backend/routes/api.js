@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getTimeline, getAlerts, createEntity, getAllEntities, createEvent, getAllEvents, getEventsByEntity, runPythonScript, getEntity, predict } = require('../Controller/MonitorController.js');
+const { getTimeline, getAlerts, createEntity, getAllEntities, createEvent, getAllEvents, getEventsByEntity, runPythonScript, getEntity, predict, train } = require('../Controller/MonitorController.js');
 
 // Define the routes
 router.get('/timeline/:entityId', getTimeline);
-router.get('/alerts', getAlerts);
+router.get('/alerts/inactive', getAlerts);
 router.get('/entities/:entityId', getEntity);
 router.post("/run-script", runPythonScript);
-router.get("/predict/:entityId", predict);
+router.post("/predict", predict);
+router.post("/train", train)
 
 //for testing
 router.get('/entity',getAllEntities);
