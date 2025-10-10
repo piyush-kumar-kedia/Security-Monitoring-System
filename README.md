@@ -9,6 +9,7 @@ cd py_scripts <br>
 create .env<br>
 pip install -r requirements.txt<br>
 python -m venv venv<br>
+upload all the csv files of dataset provided in the "data_upload" directory<br>
 python profile_preprocess.py<br>
 python ingest_and_preprocess.py<br>
 python main.py<br><br>
