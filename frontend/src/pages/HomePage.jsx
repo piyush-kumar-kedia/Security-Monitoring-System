@@ -34,19 +34,6 @@ const HomePage = () => {
     fetchAlerts();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchAlerts = async () => {
-  //     try {
-  //       const res = await axios.get("http://localhost:5000/api/alerts/inactive");
-  //       setAlerts(res.data.alerts);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-
-  //   fetchAlerts();
-  // }, []);
-
 
   const filteredEntities = entities.filter(entity => {
     const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -190,7 +177,7 @@ const HomePage = () => {
         )} */}
 
         {/* Search and Filter Section */}
-        {/* <div className="mb-6">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Users className="text-blue-600" size={28} />
@@ -228,10 +215,10 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
 
         {/* Entities Grid */}
-        {/* {filteredEntities.length === 0 ? (
+        {filteredEntities.length === 0 ? (
           <div className="bg-white p-12 rounded-2xl shadow-md text-center">
             <div className="text-gray-300 mb-4">
               <Users size={64} className="mx-auto" />
@@ -281,7 +268,7 @@ const HomePage = () => {
               </div>
             ))}
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );
