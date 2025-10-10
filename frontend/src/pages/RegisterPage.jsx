@@ -9,11 +9,11 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "", // role dropdown
+    role: "", 
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Toggle password
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,7 +42,7 @@ const Register = () => {
   return (
     <div className="max-w-md mx-auto mt-12 p-8 bg-white border rounded-2xl shadow-2xl">
       <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-        🚀 Register
+        Register
       </h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
