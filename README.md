@@ -9,6 +9,8 @@ cd py_scripts <br>
 create .env<br>
 pip install -r requirements.txt<br>
 python -m venv venv<br>
+python profile_preprocess.py<br>
+python ingest_and_preprocess.py<br>
 python main.py<br><br>
 
 cd Backend <br>
