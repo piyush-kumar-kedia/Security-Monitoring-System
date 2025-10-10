@@ -3,24 +3,29 @@ import pandas as pd
 import os
 import shutil
 import glob
-from datetime import datetime
+from datetime import datetime, timedelta
 import numpy as np
+from dotenv import load_dotenv
+
+
+# Load environment variables
+load_dotenv()
 
 # ---------- DATABASE CONFIG ----------
 DB_MAIN = {
-    "dbname": "entity_data",
-    "user": "postgres",
-    "password": "",
-    "host": "localhost",
-    "port": "5432"
+    "dbname": os.getenv("DB_MAIN_NAME"),
+    "user": os.getenv("DB_MAIN_USER"),
+    "password": os.getenv("DB_MAIN_PASSWORD"),
+    "host": os.getenv("DB_MAIN_HOST"),
+    "port": os.getenv("DB_MAIN_PORT"),
 }
 
 DB_IMAGES = {
-    "dbname": "face_images",
-    "user": "postgres",
-    "password": "",
-    "host": "localhost",
-    "port": "5432"
+    "dbname": os.getenv("DB_IMAGES_NAME"),
+    "user": os.getenv("DB_IMAGES_USER"),
+    "password": os.getenv("DB_IMAGES_PASSWORD"),
+    "host": os.getenv("DB_IMAGES_HOST"),
+    "port": os.getenv("DB_IMAGES_PORT"),
 }
 
 OUTPUT_DIR = "output"
@@ -37,7 +42,6 @@ TABLES = {
 
 # ---------- CONNECTIONS ----------
 def connect_main():
-    # return psycopg2.connect("postgresql://postgres:ethos_prod@db.tlruewxqrjvkyypmsbfg.supabase.co:5432/postgres")
     db_config = {
         'host': 'localhost',
         'port': 5432,
@@ -48,7 +52,6 @@ def connect_main():
     return psycopg2.connect(**db_config)
 
 def connect_images():
-    #return psycopg2.connect("postgresql://postgres:ethos_prod@db.tlruewxqrjvkyypmsbfg.supabase.co:5432/postgres")
     db_config = {
         'host': 'localhost',
         'port': 5432,
@@ -266,6 +269,78 @@ def build_timeline(entity_dir, entity_id, conn_main):
     timeline_list = timeline_df.to_dict(orient="records")
     return timeline_list
 
+
+#---alerts---
+
+def check_inactive_entities():
+    conn = connect_main()
+    cur = conn.cursor()
+    
+    # Get all entities
+    cur.execute("SELECT entity_id, card_id, role, department, device_hash, face_id, name FROM student_or_staff_profiles")
+    entities = cur.fetchall()
+    cols = [desc[0] for desc in cur.description]
+    entities_df = pd.DataFrame(entities, columns=cols)
+    
+    inactive_entities = []
+
+    twelve_hours_ago = datetime.now() - timedelta(hours=12)
+    
+    for _, row in entities_df.iterrows():
+        entity_id = row["entity_id"]
+        card_id = row["card_id"]
+        role = row["role"]
+        department = row["department"]
+        device_hash = row["device_hash"]
+        face_id = row["face_id"]
+        
+        last_times = []
+
+        for table, (id_field, time_field) in TABLES.items():
+            if id_field == "entity_id":
+                id_value = entity_id
+            elif id_field == "card_id":
+                id_value = card_id
+                if not id_value: continue
+            elif id_field == "device_hash":
+                id_value = device_hash
+                if not id_value: continue
+            elif id_field == "face_id":
+                id_value = face_id
+                if not id_value: continue
+            else:
+                continue
+            
+            cur.execute(f"SELECT MAX({time_field}) FROM {table} WHERE {id_field}=%s", (id_value,))
+            result = cur.fetchone()[0]
+            if result:
+                last_times.append(result)
+        
+        if last_times:
+            last_activity = max(last_times)
+            if isinstance(last_activity, str):
+                last_activity = datetime.strptime(last_activity, "%Y-%m-%d %H:%M:%S")
+            if last_activity < twelve_hours_ago:
+                inactive_entities.append({
+                    "card_id": card_id,
+                    "role": role,
+                    "department": department,
+                    "name": row["name"],
+                    "last_activity": last_activity.strftime("%Y-%m-%d %H:%M:%S")
+                })
+        else:
+            # No logs at all → consider inactive
+            inactive_entities.append({
+                "card_id": card_id,
+                "role": role,
+                "department": department,
+                "name": row["name"],
+                "last_activity": None
+            })
+    
+    cur.close()
+    conn.close()
+    return inactive_entities
 
 # ---------- MAIN QUERY FUNCTION ----------
 
