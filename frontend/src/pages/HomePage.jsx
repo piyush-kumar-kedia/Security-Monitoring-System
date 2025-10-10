@@ -100,6 +100,24 @@ const HomePage = () => {
     setEndDate(null);
   };
 
+   const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        navigate("/login");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Logout failed");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Something went wrong during logout");
+    }
+  };
+
   const anyFilterActive = () => assetType !== "All" || search || startDate || endDate;
 
   return (
@@ -109,6 +127,12 @@ const HomePage = () => {
         <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
 
         <div className="hidden md:flex gap-6">
+          <button
+        onClick={handleLogout}
+        className="hover:underline"
+      >
+        Logout
+      </button>
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/alerts" className="hover:underline">Alerts</Link>
           <Link to="/entities" className="hover:underline">Entities</Link>
