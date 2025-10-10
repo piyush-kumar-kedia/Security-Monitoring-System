@@ -280,45 +280,7 @@ return (
             </div>
           </div>
 
-          {/* Date Range Filter */}
-          {/* <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex items-center gap-2">
-              <Calendar size={20} className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Date Range:</span>
-            </div>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="From Date"
-              className="border-2 border-gray-200 px-4 py-2 rounded-lg focus:border-blue-500 focus:outline-none transition"
-            />
-            <span className="text-gray-400">→</span>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate}
-              placeholderText="To Date"
-              className="border-2 border-gray-200 px-4 py-2 rounded-lg focus:border-blue-500 focus:outline-none transition"
-            />
-            {(startDate || endDate) && (
-              <button
-                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium shadow-sm"
-                onClick={() => {
-                  setStartDate(null);
-                  setEndDate(null);
-                }}
-              >
-                <X size={16} />
-                Clear Dates
-              </button>
-            )}
-          </div> */}
+          
         </div>
       </div>
 
@@ -386,7 +348,7 @@ return (
                       <td className="px-6 py-4 text-center">
                         <button
                           className="inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium shadow-sm group-hover:shadow-md"
-                          onClick={() => navigate(`/timeline/${entity.card_id}`)}
+                          onClick={() => navigate(`/timeline/${entity.entity_id}`)}
                         >
                           <Eye size={16} />
                           View Timeline

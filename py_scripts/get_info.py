@@ -322,6 +322,7 @@ def check_inactive_entities():
                 last_activity = datetime.strptime(last_activity, "%Y-%m-%d %H:%M:%S")
             if last_activity < twelve_hours_ago:
                 inactive_entities.append({
+                    "entity_id": entity_id,
                     "card_id": card_id,
                     "role": role,
                     "department": department,
@@ -331,6 +332,7 @@ def check_inactive_entities():
         else:
             # No logs at all → consider inactive
             inactive_entities.append({
+                "entity_id": entity_id,
                 "card_id": card_id,
                 "role": role,
                 "department": department,
