@@ -1,8 +1,8 @@
 // src/pages/TimelinePage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Activity, User, Building, Mail, Phone, Calendar, MapPin, Clock, FileText, TrendingUp, AlertCircle, Loader } from "lucide-react";
+import { Activity, User, Menu, Building, Mail, Phone, Calendar, MapPin, Clock, FileText, TrendingUp, AlertCircle, Loader } from "lucide-react";
 import EventTimelineGraph from "../components/EventTimelineGraph";
 
 const TimelinePage = () => {
@@ -11,6 +11,7 @@ const TimelinePage = () => {
   const [entity, setEntity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [prediction, setPrediction] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Predictor states
   const [timestamp, setTimestamp] = useState("");
@@ -62,6 +63,24 @@ const TimelinePage = () => {
     });
 
     setFilteredTimeline(filtered);
+  };
+
+    const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        navigate("/login");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Logout failed");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Something went wrong during logout");
+    }
   };
 
   useEffect(() => {
@@ -181,7 +200,7 @@ const TimelinePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      {/* <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex items-center gap-4 mb-2">
             <div className="p-3 bg-blue-100 rounded-xl">
@@ -195,9 +214,39 @@ const TimelinePage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
+        <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
+
+        <div className="hidden md:flex gap-6">
+          <button
+            onClick={handleLogout}
+            className="hover:underline"
+          >
+            Logout
+          </button>
+          <Link to="/" className="hover:underline">Home</Link>
+          <Link to="/alerts" className="hover:underline">Alerts</Link>
+          <Link to="/entity" className="hover:underline">Entities</Link>
+        </div>
+
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </nav>
+
+      {isMenuOpen && (
+        <div className="md:hidden bg-blue-700 text-white p-4 fixed w-full top-16 z-40">
+          <Link to="/" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Home</Link>
+          <Link to="/alerts" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Alerts</Link>
+          <Link to="/entity" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Entities</Link>
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto px-6 py-8 mt-14">
         {/* Entity Details Card */}
         {entity && (
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-12 border border-gray-100">

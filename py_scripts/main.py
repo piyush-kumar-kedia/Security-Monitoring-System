@@ -51,10 +51,6 @@ def details(input: QueryInput):
     result = entity_details(user_input)
     return {"status": "success", "details": result}
 
-# @app.get("/predict/{entity_id}")
-# def predict(entity_id: str):
-#     result = predict_entity(entity_id)
-#     return result
 
 @app.post("/train")
 def train_model(req: TrainRequest):

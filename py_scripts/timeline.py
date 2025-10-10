@@ -1,13 +1,11 @@
 import psycopg2
 from datetime import datetime
+import dotenv
+import os
+from dotenv import load_dotenv
 
-DB_CONFIG = {
-    'dbname': 'your_database_name',
-    'user': 'postgres',
-    'password': 'your_password',
-    'host': 'localhost',
-    'port': '5432'
-}
+load_dotenv()
+
 
 def get_timeline(name, department, start_time, end_time):
     """
@@ -15,14 +13,15 @@ def get_timeline(name, department, start_time, end_time):
     """
     try:
         # Connect to the database
-        conn = psycopg2.connect(
-            # dbname=DB_CONFIG['dbname'],
-            # user=DB_CONFIG['user'],
-            # password=DB_CONFIG['password'],
-            # host=DB_CONFIG['host'],
-            # port=DB_CONFIG['port']
-            "postgresql://postgres:Jayansh%401523@db.dwzkpftvngzpckkxmtii.supabase.co:5432/postgres"
-        )
+        db_config = {
+            'host': os.getenv("DB_MAIN_HOST"),
+            'port': os.getenv("DB_MAIN_PORT"),
+            'user': os.getenv("DB_MAIN_USER"),
+            'password': os.getenv("DB_MAIN_PASSWORD"),
+            'database': os.getenv("DB_MAIN_NAME")
+        }
+        conn = psycopg2.connect(**db_config)
+    
         cursor = conn.cursor()
 
         # SQL query to get timeline data

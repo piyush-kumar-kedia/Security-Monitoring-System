@@ -1,11 +1,16 @@
 import subprocess
 import sys
 import os
+from dotenv import load_dotenv
 
-DB_USER = "postgres"
-DB_PASS = "Jayansh@1523"
-DB_HOST = "db.dwzkpftvngzpckkxmtii.supabase.co"
-DB_PORT = "5432"
+load_dotenv()
+
+
+
+DB_USER = os.getenv("DB_MAIN_USER")
+DB_PASS = os.getenv("DB_MAIN_PASSWORD")
+DB_HOST = os.getenv("DB_MAIN_HOST")
+DB_PORT = os.getenv("DB_MAIN_PORT")
 
 def run_python(script):
     print(f"\nRunning {script} ...")

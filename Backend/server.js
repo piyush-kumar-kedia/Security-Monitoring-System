@@ -2,20 +2,31 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
+const cookieParser= require('cookie-parser');
+const connectDB = require('./config/mdb');
+
 // Load env vars
 dotenv.config();
 
 // Connect to database
-// connectDB();
+connectDB();
 
 const app = express();
 
 // Middleware
 app.use(express.json()); // Body parser
-app.use(cors());         // Enable Cross-Origin Resource Sharing
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);       // Enable Cross-Origin Resource Sharing
+app.use(cookieParser());
 
 // Mount routers
 app.use('/api', require('./routes/api'));
+
+app.use('/auth', require('./routes/authRoutes.js'));
 
 app.get('/',(req,res)=>{
     res.send("Server is running");

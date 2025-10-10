@@ -43,21 +43,21 @@ TABLES = {
 # ---------- CONNECTIONS ----------
 def connect_main():
     db_config = {
-        'host': 'localhost',
-        'port': 5432,
-        'user': 'postgres',
-        'password': 'Jayansh@1523',
-        'database': 'entity_data'
+        'host': os.getenv("DB_MAIN_HOST"),
+        'port': os.getenv("DB_MAIN_PORT"),
+        'user': os.getenv("DB_MAIN_USER"),
+        'password': os.getenv("DB_MAIN_PASSWORD"),
+        'database': os.getenv("DB_MAIN_NAME")
     }
     return psycopg2.connect(**db_config)
 
 def connect_images():
     db_config = {
-        'host': 'localhost',
-        'port': 5432,
-        'user': 'postgres',
-        'password': 'Jayansh@1523',
-        'database': 'entity_data'
+        'host': os.getenv("DB_MAIN_HOST"),
+        'port': os.getenv("DB_MAIN_PORT"),
+        'user': os.getenv("DB_MAIN_USER"),
+        'password': os.getenv("DB_MAIN_PASSWORD"),
+        'database': os.getenv("DB_MAIN_NAME")
     }
     return psycopg2.connect(**db_config)
 
@@ -322,6 +322,7 @@ def check_inactive_entities():
                 last_activity = datetime.strptime(last_activity, "%Y-%m-%d %H:%M:%S")
             if last_activity < twelve_hours_ago:
                 inactive_entities.append({
+                    "entity_id": entity_id,
                     "card_id": card_id,
                     "role": role,
                     "department": department,
@@ -331,6 +332,7 @@ def check_inactive_entities():
         else:
             # No logs at all → consider inactive
             inactive_entities.append({
+                "entity_id": entity_id,
                 "card_id": card_id,
                 "role": role,
                 "department": department,
