@@ -8,6 +8,7 @@ git clone https://github.com/piyush-kumar-kedia/Security-Monitoring-System.git
 cd py_scripts <br>
 create .env<br>
 pip install -r requirements.txt<br>
+python -m venv venv<br>
 python main.py<br><br>
 
 cd Backend <br>
@@ -19,3 +20,6 @@ npm run dev<br>
 cd frontend <br>
 npm i<br>
 npm run dev<br>
+
+For env and credentials:
+https://drive.google.com/drive/folders/1UnqRRu5fdcrpbs3zFfxnPoIs_hz1mlCS
