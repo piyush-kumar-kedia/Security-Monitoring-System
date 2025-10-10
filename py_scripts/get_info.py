@@ -43,21 +43,21 @@ TABLES = {
 # ---------- CONNECTIONS ----------
 def connect_main():
     db_config = {
-        'host': 'localhost',
-        'port': 5432,
-        'user': 'postgres',
-        'password': 'Jayansh@1523',
-        'database': 'entity_data'
+        'host': os.getenv("DB_MAIN_HOST"),
+        'port': os.getenv("DB_MAIN_PORT"),
+        'user': os.getenv("DB_MAIN_USER"),
+        'password': os.getenv("DB_MAIN_PASSWORD"),
+        'database': os.getenv("DB_MAIN_NAME")
     }
     return psycopg2.connect(**db_config)
 
 def connect_images():
     db_config = {
-        'host': 'localhost',
-        'port': 5432,
-        'user': 'postgres',
-        'password': 'Jayansh@1523',
-        'database': 'entity_data'
+        'host': os.getenv("DB_MAIN_HOST"),
+        'port': os.getenv("DB_MAIN_PORT"),
+        'user': os.getenv("DB_MAIN_USER"),
+        'password': os.getenv("DB_MAIN_PASSWORD"),
+        'database': os.getenv("DB_MAIN_NAME")
     }
     return psycopg2.connect(**db_config)
 
