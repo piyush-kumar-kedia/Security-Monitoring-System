@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -18,7 +18,8 @@ import {
   GraduationCap,
   Briefcase,
   Package,
-  Smartphone
+  Smartphone,
+  Menu
 } from "lucide-react";
 
 const EntitiesPage = () => {
@@ -32,6 +33,7 @@ const EntitiesPage = () => {
   const [entitiesPerPage] = useState(10);
   const [timelines, setTimelines] = useState({});
   const navigate = useNavigate();
+  const[isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchEntities = async () => {
@@ -115,20 +117,14 @@ const entityConfig = {
     borderColor: "border-green-200",
     icon: Briefcase
   },
-  asset: {
+  faculty: {
     color: "bg-amber-500",
     lightColor: "bg-amber-50",
     textColor: "text-amber-700",
     borderColor: "border-amber-200",
     icon: Package
   },
-  device: {
-    color: "bg-purple-500",
-    lightColor: "bg-purple-50",
-    textColor: "text-purple-700",
-    borderColor: "border-purple-200",
-    icon: Smartphone
-  },
+  
 };
 
 const hasActiveFilters = searchName || searchRoll || categoryFilter || startDate || endDate;
@@ -142,20 +138,62 @@ const clearAllFilters = () => {
   setCurrentPage(1);
 };
 
+const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        navigate("/login");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Logout failed");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Something went wrong during logout");
+    }
+  };
+
+
 return (
   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Users size={36} className="text-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">Entity Management</h1>
-            <p className="text-gray-600 mt-1">Browse and filter all registered entities</p>
-          </div>
+    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
+        <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
+
+        <div className="hidden md:flex gap-6">
+          <button
+            onClick={handleLogout}
+            className="hover:underline"
+          >
+            Logout
+          </button>
+          <Link to="/" className="hover:underline">Home</Link>
+          <Link to="/alerts" className="hover:underline">Alerts</Link>
+          <Link to="/entity" className="hover:underline">Entities</Link>
         </div>
+
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </nav>
+
+      {isMenuOpen && (
+        <div className="md:hidden bg-blue-700 text-white p-4 fixed w-full top-16 z-40">
+          <Link to="/" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Home</Link>
+          <Link to="/alerts" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Alerts</Link>
+          <Link to="/entity" className="block py-2 hover:bg-blue-600 rounded" onClick={() => setIsMenuOpen(false)}>Entities</Link>
+        </div>
+      )}
+    <div className="max-w-7xl mx-auto p-6 mt-10">
+      {/* Header Section */}
+      
+      <div className="mb-8">
+        {/* Header */}
+      
 
         {/* Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
@@ -237,51 +275,12 @@ return (
                 <option value="">All Categories</option>
                 <option value="student">Student</option>
                 <option value="staff">Staff</option>
-                <option value="asset">Asset</option>
-                <option value="device">Device</option>
+                <option value="faculty">Faculty</option>
               </select>
             </div>
           </div>
 
-          {/* Date Range Filter */}
-          {/* <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex items-center gap-2">
-              <Calendar size={20} className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Date Range:</span>
-            </div>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="From Date"
-              className="border-2 border-gray-200 px-4 py-2 rounded-lg focus:border-blue-500 focus:outline-none transition"
-            />
-            <span className="text-gray-400">→</span>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate}
-              placeholderText="To Date"
-              className="border-2 border-gray-200 px-4 py-2 rounded-lg focus:border-blue-500 focus:outline-none transition"
-            />
-            {(startDate || endDate) && (
-              <button
-                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-medium shadow-sm"
-                onClick={() => {
-                  setStartDate(null);
-                  setEndDate(null);
-                }}
-              >
-                <X size={16} />
-                Clear Dates
-              </button>
-            )}
-          </div> */}
+          
         </div>
       </div>
 
@@ -349,7 +348,7 @@ return (
                       <td className="px-6 py-4 text-center">
                         <button
                           className="inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium shadow-sm group-hover:shadow-md"
-                          onClick={() => navigate(`/timeline/${entity.card_id}`)}
+                          onClick={() => navigate(`/timeline/${entity.entity_id}`)}
                         >
                           <Eye size={16} />
                           View Timeline

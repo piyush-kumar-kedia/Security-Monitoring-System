@@ -186,7 +186,7 @@ exports.runPythonScript = async (req, res) => {
   try {
     console.log("Calling FastAPI for entityId:", entityId);
     const response = await axios.post("http://127.0.0.1:8000/run-query", {
-      identifier_type: 'card_id',
+      identifier_type: 'entity_id',
       identifier_value: entityId,
       start_time: '',
       end_time: '',
@@ -232,39 +232,12 @@ exports.predict = async(req, res) => {
   
   try {
     console.log('starting predicting...')
-    console.log('card_id: ', entity_id);
-    // First get the entity_id from the database using card_id
-    const entityQuery = await pool.query(
-      `SELECT entity_id FROM student_or_staff_profiles WHERE card_id = $1`,
-      [entity_id]
-    );
+    console.log('entity_id: ', entity_id);
 
-    console.log(entityQuery);
-
-    if (entityQuery.rows.length === 0) {
-      console.log('no entiyQuery found')
-      return res.status(404).json({ 
-        error: `No entity found with card_id: ${entity_id}` 
-      });
-    }
-
-    // Get the actual entity_id
-    const actualEntityId = entityQuery.rows[0].entity_id;
-
-    console.log('entity_id: ', actualEntityId);
-
-    // Modify request body with actual entity_id
-    const predictionBody = {
-      ...req.body,
-      entity_id: actualEntityId
-    };
-
-    console.log(predictionBody);
-
-    // Make prediction request with actual entity_id
+    console.log('payload: ', req.body);
     const response = await axios.post(
       `http://127.0.0.1:8000/predict`, 
-      predictionBody
+      req.body
     );
 
     res.json(response.data);
