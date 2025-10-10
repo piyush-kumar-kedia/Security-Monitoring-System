@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Activity, User, Menu, Building, Mail, Phone, Calendar, MapPin, Clock, FileText, TrendingUp, AlertCircle, Loader } from "lucide-react";
 import EventTimelineGraph from "../components/EventTimelineGraph";
+import { useNavigate } from "react-router-dom";
 
 const TimelinePage = () => {
   const { entityId } = useParams();
@@ -20,6 +21,8 @@ const TimelinePage = () => {
   const [predictionError, setPredictionError] = useState(null);
   const [training, setTraining] = useState(false);
   const [trained, setTrained] = useState(false);
+
+  const navigate = useNavigate()
 
   const [timeFilter, setTimeFilter] = useState({
     startTime: '',
@@ -199,25 +202,10 @@ const TimelinePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header Section */}
-      {/* <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="p-3 bg-blue-100 rounded-xl">
-              <Activity size={32} className="text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                {entity?.name || "Entity"}'s Timeline
-              </h1>
-              <p className="text-gray-500 mt-1">Comprehensive activity history and events</p>
-            </div>
-          </div>
-        </div>
-      </div> */}
+      
 
       <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
-        <h1 className="text-2xl font-bold">Campus Security Dashboard</h1>
+        <h1 className="text-2xl font-bold">Campus Security-Monitoring-System</h1>
 
         <div className="hidden md:flex gap-6">
           <button
@@ -320,18 +308,7 @@ const TimelinePage = () => {
             Predict where this entity is likely to be at a specific time based on historical patterns.
           </p>
 
-          {/* Training Status */}
-          {/* {training && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-3">
-                <Loader size={20} className="text-blue-600 animate-spin flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-blue-800 mb-1">Training Model</h4>
-                  <p className="text-blue-700 text-sm">Please wait while we train the prediction model...</p>
-                </div>
-              </div>
-            </div>
-          )} */}
+          
 
           {/* Input Section */}
           <div className="space-y-4 mb-6">
@@ -451,15 +428,7 @@ const TimelinePage = () => {
                     </p>
                   </div>
 
-                  {/* <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                      Details
-                    </p>
-                    <p className="text-lg font-bold text-gray-800 capitalize">
-                      
-                      
-                    </p>
-                  </div> */}
+                  
                 </div>
 
                 {result.explanation && (
@@ -554,7 +523,7 @@ const TimelinePage = () => {
                   value={timeFilter.startTime}
                   onChange={(e) => setTimeFilter(prev => ({ ...prev, startTime: e.target.value }))}
                 />
-                {/* <Calendar size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" /> */}
+                
               </div>
             </div>
 
@@ -569,7 +538,7 @@ const TimelinePage = () => {
                   value={timeFilter.endTime}
                   onChange={(e) => setTimeFilter(prev => ({ ...prev, endTime: e.target.value }))}
                 />
-                {/* <Calendar size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" /> */}
+                
               </div>
             </div>
           </div>
@@ -597,12 +566,7 @@ const TimelinePage = () => {
         <EventTimelineGraph timeline={filteredTimeline} />
 
         {/* Timeline */}
-        {/* {timeline.length === 0 ? (
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-8 rounded-2xl border-2 border-yellow-200 text-center shadow-md">
-            <div className="text-6xl mb-4">📭</div>
-            <h3 className="text-xl font-bold text-yellow-800 mb-2">No Timeline Events</h3>
-            <p className="text-yellow-700">No activity records found for this entity.</p>
-          </div> */}
+        
         {filteredTimeline.length === 0 ? (
           <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-8 rounded-2xl border-2 border-yellow-200 text-center shadow-md">
             <div className="text-6xl mb-4">📭</div>
