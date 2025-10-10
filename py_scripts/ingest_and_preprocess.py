@@ -3,13 +3,13 @@ import shutil
 import pandas as pd
 from datetime import datetime
 from glob import glob
-# DB_CONFIG = {
-#     'host': 'localhost',
-#     'port': 5432,
-#     'user': 'postgres',
-#     'password': 'Jayansh@1523',
-#     'database': 'entity_data'
-# }
+DB_CONFIG = {
+    "dbname": os.getenv("DB_MAIN_NAME"),
+    "user": os.getenv("DB_MAIN_USER"),
+    "password": os.getenv("DB_MAIN_PASSWORD"),
+    "host": os.getenv("DB_MAIN_HOST"),
+    "port": os.getenv("DB_MAIN_PORT"),
+}
 
 DATA_UPLOAD_DIR = 'data_upload'
 DATA_PROCESSED_DIR = 'data'

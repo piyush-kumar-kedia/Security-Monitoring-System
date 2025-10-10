@@ -6,11 +6,11 @@ FACE_IMAGES_DIR = os.path.join('data_upload', 'face_images')
 DATA_FACE_IMAGES_DIR = os.path.join('data', 'face_images')
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5432,
-    'user': 'postgres',
-    'password': 'Jayansh@1523', 
-    'database': 'face_images'
+    "dbname": os.getenv("DB_MAIN_NAME"),
+    "user": os.getenv("DB_MAIN_USER"),
+    "password": os.getenv("DB_MAIN_PASSWORD"),
+    "host": os.getenv("DB_MAIN_HOST"),
+    "port": os.getenv("DB_MAIN_PORT"),
 }
 
 os.makedirs(DATA_FACE_IMAGES_DIR, exist_ok=True)
