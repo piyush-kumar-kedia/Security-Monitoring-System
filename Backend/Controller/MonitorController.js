@@ -1,7 +1,7 @@
-const pool = require('../config/db');
-const axios = require('axios');
+import pool from '../config/db.js';
+import axios from 'axios';
 
-exports.getTimeline = async (req, res) => {
+export const getTimeline = async (req, res) => {
     try {
         const { entityId } = req.params;
       
@@ -23,7 +23,7 @@ exports.getTimeline = async (req, res) => {
 };
 
 
-exports.getAlerts = async (req, res) => {
+export const getAlerts = async (req, res) => {
   try {
     const response = await axios.get("http://127.0.0.1:8000/alerts/inactive");
     const data = response.data;
@@ -44,7 +44,7 @@ exports.getAlerts = async (req, res) => {
 };
 
 
-exports.getAllEntities = async (req, res) => {
+export const getAllEntities = async (req, res) => {
   try {
     console.log("Fetching from pool");
     const entities = await pool.query("SELECT * FROM student_or_staff_profiles");
@@ -56,7 +56,7 @@ exports.getAllEntities = async (req, res) => {
 };
 
 
-exports.runPythonScript = async (req, res) => {
+export const runPythonScript = async (req, res) => {
   const { entityId } = req.body;
 
   try {
@@ -79,13 +79,13 @@ exports.runPythonScript = async (req, res) => {
   }
 };
 
-exports.getEntity = async(req, res)=>{
+export const getEntity = async(req, res)=>{
   const {entityId} = req.params;
 
   try {
     console.log("Calling FastAPI getDetails for entityId:", entityId);
     const response = await axios.post("http://127.0.0.1:8000/details", {
-      identifier_type: 'card_id',
+      identifier_type: 'entity_id',
       identifier_value: entityId,
       start_time: '',
       end_time: '',
@@ -103,7 +103,7 @@ exports.getEntity = async(req, res)=>{
 };
 
 
-exports.predict = async(req, res) => {
+export const predict = async(req, res) => {
   const {entity_id, timestamp} = req.body;
   
   try {
@@ -126,7 +126,7 @@ exports.predict = async(req, res) => {
   }
 };
 
-exports.train = async(req, res)=>{
+export const train = async(req, res)=>{
   try {
     const response = await axios.post(`http://127.0.0.1:8000/train`, req.body);
     res.json(response.data);

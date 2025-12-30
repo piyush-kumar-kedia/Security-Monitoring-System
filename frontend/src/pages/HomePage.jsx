@@ -242,15 +242,15 @@ const HomePage = () => {
                         <span className={`inline-block px-2 py-1 mt-1 rounded-full text-xs font-medium ${tagClass}`}>
                           {(a.role || a.type || "Unknown")}
                         </span>
-                        <p className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
+                        <div className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
                           Entity Id: <h3 className="font-semibold text-gray-800 truncate">{a.entity_id|| 'None'}</h3>
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
                           <h3 className="font-semibold text-gray-800 truncate">{a.department|| 'None'}</h3>
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2 flex items-center gap-1">
                           <Clock size={14} /> Updated on: {a.last_activity.toLocaleString() || ""}
-                        </p>
+                        </div>
                         <div className="mt-3 flex justify-end">
                           <button
                             onClick={() => navigate(`/timeline/${a.entity_id}`)}
@@ -291,12 +291,12 @@ const HomePage = () => {
                         <span className={`inline-block px-2 py-1 mt-1 rounded-full text-xs font-medium ${tagClass}`}>
                           {e.role || "Unknown"}
                         </span>
-                        <p className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
+                        <div className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
                           Roll no: <h3 className="font-semibold text-gray-800 truncate">{e.entity_id|| 'None'}</h3>
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
                           <h3 className="font-semibold text-gray-800 truncate">{e.department|| 'None'}</h3>
-                        </p>
+                        </div>
                         
                         <div className="mt-3 flex justify-end">
                           <button

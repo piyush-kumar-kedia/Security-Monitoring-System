@@ -7,20 +7,18 @@ import DashboardCardSkeleton from '../components/DashboardCardSkeleton';
 const HomePageSkeleton = () => {
   return (
     <>
-      {/* Stats Section */}
+
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
         <StatCardSkeleton />
         <StatCardSkeleton />
       </div>
 
-      {/* Filters Section */}
       <div className="p-6">
         <div className="bg-white p-4 rounded-xl shadow flex flex-wrap gap-3 items-center justify-between">
           <Skeleton width={200} height={40} />
         </div>
       </div>
 
-      {/* Alerts Section */}
       <div className="p-6 bg-white rounded-xl shadow">
         <h2 className="text-xl font-bold text-gray-400 mb-4">
           <Skeleton width={200} />
@@ -30,7 +28,6 @@ const HomePageSkeleton = () => {
         </div>
       </div>
 
-      {/* Entities Section */}
       <div className="p-6 bg-white rounded-xl shadow">
         <h2 className="text-xl font-bold text-gray-800 mb-4">
           <Skeleton width={180} />

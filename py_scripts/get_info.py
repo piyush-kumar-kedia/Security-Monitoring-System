@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2 import pool
 import pandas as pd
 import os
 import shutil
@@ -30,6 +31,36 @@ DB_IMAGES = {
 
 OUTPUT_DIR = "output"
 
+# ---------- CONNECTION POOLS ----------
+_main_pool = None
+_images_pool = None
+
+def _initialize_pools():
+    """Initialize connection pools on first use."""
+    global _main_pool, _images_pool
+    
+    if _main_pool is None:
+        _main_pool = pool.SimpleConnectionPool(
+            minconn=2,
+            maxconn=20,
+            host=os.getenv("DB_MAIN_HOST"),
+            port=os.getenv("DB_MAIN_PORT"),
+            user=os.getenv("DB_MAIN_USER"),
+            password=os.getenv("DB_MAIN_PASSWORD"),
+            database=os.getenv("DB_MAIN_NAME")
+        )
+    
+    if _images_pool is None:
+        _images_pool = pool.SimpleConnectionPool(
+            minconn=1,
+            maxconn=5,
+            host=os.getenv("DB_IMAGES_HOST"),
+            port=os.getenv("DB_IMAGES_PORT"),
+            user=os.getenv("DB_IMAGES_USER"),
+            password=os.getenv("DB_IMAGES_PASSWORD"),
+            database=os.getenv("DB_IMAGES_NAME")
+        )
+
 # Table identifier mapping: table -> (identifier field, timestamp field)
 TABLES = {
     "wifi_associations_logs": ("device_hash", "timestamp"),
@@ -42,24 +73,24 @@ TABLES = {
 
 # ---------- CONNECTIONS ----------
 def connect_main():
-    db_config = {
-        'host': os.getenv("DB_MAIN_HOST"),
-        'port': os.getenv("DB_MAIN_PORT"),
-        'user': os.getenv("DB_MAIN_USER"),
-        'password': os.getenv("DB_MAIN_PASSWORD"),
-        'database': os.getenv("DB_MAIN_NAME")
-    }
-    return psycopg2.connect(**db_config)
+    """Get a connection from the main database pool."""
+    _initialize_pools()
+    return _main_pool.getconn()
 
 def connect_images():
-    db_config = {
-        'host': os.getenv("DB_MAIN_HOST"),
-        'port': os.getenv("DB_MAIN_PORT"),
-        'user': os.getenv("DB_MAIN_USER"),
-        'password': os.getenv("DB_MAIN_PASSWORD"),
-        'database': os.getenv("DB_MAIN_NAME")
-    }
-    return psycopg2.connect(**db_config)
+    """Get a connection from the images database pool."""
+    _initialize_pools()
+    return _images_pool.getconn()
+
+def release_main(conn):
+    """Return a connection to the main database pool."""
+    if conn and _main_pool:
+        _main_pool.putconn(conn)
+
+def release_images(conn):
+    """Return a connection to the images database pool."""
+    if conn and _images_pool:
+        _images_pool.putconn(conn)
 
 # ---------- OUTPUT FOLDER ----------
 def clear_output_folder():
@@ -100,9 +131,12 @@ def get_user_input():
 
 # ---------- RESOLVE ENTITY ----------
 def resolve_entity(cur, identifier):
+    #print("Resolving entity for identifier:", identifier)
     key, value = list(identifier.items())[0]
+    print(f"Resolving entity by {key} = {value} ...")
     cur.execute(f"SELECT * FROM student_or_staff_profiles WHERE {key}=%s", (value,))
     row = cur.fetchone()
+    #print("Resolved entity:", row)
     if not row:
         return None
     cols = [desc[0] for desc in cur.description]
@@ -129,24 +163,47 @@ def query_table(cur, table, id_field, id_value, time_field=None, start=None, end
     return pd.DataFrame(rows, columns=cols)
 
 # ---------- SAVE IMAGES ----------
-def save_images(entity_id, entity_dir):
+def save_images(entity_id, entity_dir=None, save_to_disk=True):
+    """Fetch images and optionally save to disk.
+    Returns: list of dicts with image_id and image_data
+    """
     face_id = "F" + entity_id[1:]  # derive face_id
-    conn_img = connect_images()
-    cur_img = conn_img.cursor()
-    img_dir = os.path.join(entity_dir, "images")
-    os.makedirs(img_dir, exist_ok=True)
-    cur_img.execute("SELECT image_id, image_data FROM face_images WHERE image_id LIKE %s", (f"{face_id}%",))
-    rows = cur_img.fetchall()
-    for image_id, image_data in rows:
-        filename = image_id if image_id.lower().endswith(".jpg") else f"{image_id}.jpg"
-        with open(os.path.join(img_dir, filename), "wb") as f:
-            f.write(image_data)
-    cur_img.close()
-    conn_img.close()
-    print(f"Saved {len(rows)} images for entity_id={entity_id} (face_id={face_id})")
+    conn_img = None
+    try:
+        conn_img = connect_images()
+        cur_img = conn_img.cursor()
+        cur_img.execute("SELECT image_id, image_data FROM face_images WHERE image_id LIKE %s", (f"{face_id}%",))
+        rows = cur_img.fetchall()
+        
+        images = []
+        for image_id, image_data in rows:
+            images.append({"image_id": image_id, "image_data": image_data})
+            
+            if save_to_disk and entity_dir:
+                img_dir = os.path.join(entity_dir, "images")
+                os.makedirs(img_dir, exist_ok=True)
+                filename = image_id if image_id.lower().endswith(".jpg") else f"{image_id}.jpg"
+                with open(os.path.join(img_dir, filename), "wb") as f:
+                    f.write(image_data)
+        
+        if save_to_disk:
+            print(f"Saved {len(rows)} images for entity_id={entity_id} (face_id={face_id})")
+        return images
+    finally:
+        if conn_img:
+            release_images(conn_img)
 
 # ---------- BUILD TIMELINE ----------
-def build_timeline(entity_dir, entity_id, conn_main):
+def build_timeline(entity_dir, entity_id, conn_main, save_to_disk=True, data_dict=None):
+    """Build timeline from entity data.
+    
+    Args:
+        entity_dir: directory path (only used when save_to_disk=True)
+        entity_id: the entity ID
+        conn_main: database connection
+        save_to_disk: whether to save timeline to disk
+        data_dict: dict mapping table names to dataframes (used when save_to_disk=False)
+    """
     timeline_records = []
 
     schema = [
@@ -157,21 +214,35 @@ def build_timeline(entity_dir, entity_id, conn_main):
     ]
 
     cur = conn_main.cursor()
-    cur.execute("SELECT entity_id, card_id, device_hash, face_id, name FROM student_or_staff_profiles")
-    all_profiles = cur.fetchall()
-    cols = [desc[0] for desc in cur.description]
-    profiles_df = pd.DataFrame(all_profiles, columns=cols)
+    try:
+        cur.execute("SELECT entity_id, card_id, device_hash, face_id, name FROM student_or_staff_profiles")
+        all_profiles = cur.fetchall()
+        cols = [desc[0] for desc in cur.description]
+        profiles_df = pd.DataFrame(all_profiles, columns=cols)
+    finally:
+        cur.close()
 
     def get_names_by_field(field, value):
         if value is None: return None
         matches = profiles_df.loc[profiles_df[field] == value, "name"].unique()
         return ", ".join(matches) if len(matches) > 0 else None
 
-    csv_files = glob.glob(os.path.join(entity_dir, "*.csv"))
+    # Get data from either CSV files or passed data_dict
+    table_data = {}
+    if save_to_disk and entity_dir:
+        csv_files = glob.glob(os.path.join(entity_dir, "*.csv"))
+        for file in csv_files:
+            table = os.path.splitext(os.path.basename(file))[0]
+            table_data[table] = pd.read_csv(file)
+    elif data_dict:
+        table_data = data_dict
+    else:
+        # No data available
+        return []
 
-    for file in csv_files:
-        table = os.path.splitext(os.path.basename(file))[0]
-        df = pd.read_csv(file)
+    for table, df in table_data.items():
+        if df.empty:
+            continue
 
         if table == "lab_bookings":
             for _, row in df.iterrows():
@@ -259,9 +330,12 @@ def build_timeline(entity_dir, entity_id, conn_main):
         errors="coerce"
     )
     timeline_df = timeline_df.sort_values("timeline_timestamp")
-    out_path = os.path.join(entity_dir, f"entity_{entity_id}_timeline.csv")
-    timeline_df.to_csv(out_path, index=False)
-    print(f"Timeline saved: {out_path}")
+    
+    if save_to_disk and entity_dir:
+        out_path = os.path.join(entity_dir, f"entity_{entity_id}_timeline.csv")
+        timeline_df.to_csv(out_path, index=False)
+        print(f"Timeline saved: {out_path}")
+    
     # timeline_df is your DataFrame
     timeline_df = timeline_df.replace({np.nan: None, np.inf: None, -np.inf: None})
 
@@ -273,140 +347,184 @@ def build_timeline(entity_dir, entity_id, conn_main):
 #---alerts---
 
 def check_inactive_entities():
-    conn = connect_main()
-    cur = conn.cursor()
-    
-    # Get all entities
-    cur.execute("SELECT entity_id, card_id, role, department, device_hash, face_id, name FROM student_or_staff_profiles")
-    entities = cur.fetchall()
-    cols = [desc[0] for desc in cur.description]
-    entities_df = pd.DataFrame(entities, columns=cols)
-    
-    inactive_entities = []
-
-    twelve_hours_ago = datetime.now() - timedelta(hours=12)
-    
-    for _, row in entities_df.iterrows():
-        entity_id = row["entity_id"]
-        card_id = row["card_id"]
-        role = row["role"]
-        department = row["department"]
-        device_hash = row["device_hash"]
-        face_id = row["face_id"]
+    """Check for entities with no activity in the last 12 hours using efficient SQL."""
+    conn = None
+    try:
+        conn = connect_main()
+        cur = conn.cursor()
         
-        last_times = []
-
-        for table, (id_field, time_field) in TABLES.items():
-            if id_field == "entity_id":
-                id_value = entity_id
-            elif id_field == "card_id":
-                id_value = card_id
-                if not id_value: continue
-            elif id_field == "device_hash":
-                id_value = device_hash
-                if not id_value: continue
-            elif id_field == "face_id":
-                id_value = face_id
-                if not id_value: continue
-            else:
-                continue
+        twelve_hours_ago = datetime.now() - timedelta(hours=12)
+        
+        # Build a single SQL query using UNION ALL to aggregate all events in one pass
+        # This allows Postgres to use indexes and parallel execution efficiently
+        sql = """
+        WITH all_events AS (
+            -- WiFi associations
+            SELECT p.entity_id, w.timestamp
+            FROM wifi_associations_logs w
+            JOIN student_or_staff_profiles p ON w.device_hash = p.device_hash
+            WHERE p.device_hash IS NOT NULL
             
-            cur.execute(f"SELECT MAX({time_field}) FROM {table} WHERE {id_field}=%s", (id_value,))
-            result = cur.fetchone()[0]
-            if result:
-                last_times.append(result)
+            UNION ALL
+            
+            -- Library checkouts
+            SELECT entity_id, timestamp
+            FROM library_checkouts
+            
+            UNION ALL
+            
+            -- Lab bookings
+            SELECT entity_id, start_time AS timestamp
+            FROM lab_bookings
+            
+            UNION ALL
+            
+            -- Free text notes
+            SELECT entity_id, timestamp
+            FROM free_text_notes
+            
+            UNION ALL
+            
+            -- CCTV frames
+            SELECT p.entity_id, c.timestamp
+            FROM cctv_frames c
+            JOIN student_or_staff_profiles p ON c.face_id = p.face_id
+            WHERE p.face_id IS NOT NULL
+            
+            UNION ALL
+            
+            -- Campus card swipes
+            SELECT p.entity_id, s.timestamp
+            FROM campus_card_swipes s
+            JOIN student_or_staff_profiles p ON s.card_id = p.card_id
+            WHERE p.card_id IS NOT NULL
+        ),
+        entity_last_activity AS (
+            SELECT 
+                entity_id,
+                MAX(timestamp) AS last_activity
+            FROM all_events
+            GROUP BY entity_id
+        )
+        SELECT 
+            p.entity_id,
+            p.card_id,
+            p.role,
+            p.department,
+            p.name,
+            COALESCE(ela.last_activity, NULL) AS last_activity
+        FROM student_or_staff_profiles p
+        LEFT JOIN entity_last_activity ela ON p.entity_id = ela.entity_id
+        WHERE ela.last_activity IS NULL OR ela.last_activity < %s
+        ORDER BY ela.last_activity NULLS LAST
+        """
         
-        if last_times:
-            last_activity = max(last_times)
-            if isinstance(last_activity, str):
-                last_activity = datetime.strptime(last_activity, "%Y-%m-%d %H:%M:%S")
-            if last_activity < twelve_hours_ago:
-                inactive_entities.append({
-                    "entity_id": entity_id,
-                    "card_id": card_id,
-                    "role": role,
-                    "department": department,
-                    "name": row["name"],
-                    "last_activity": last_activity.strftime("%Y-%m-%d %H:%M:%S")
-                })
-        else:
-            # No logs at all → consider inactive
-            inactive_entities.append({
-                "entity_id": entity_id,
-                "card_id": card_id,
-                "role": role,
-                "department": department,
-                "name": row["name"],
-                "last_activity": None
-            })
-    
-    cur.close()
-    conn.close()
-    return inactive_entities
+        cur.execute(sql, (twelve_hours_ago,))
+        rows = cur.fetchall()
+        cols = [desc[0] for desc in cur.description]
+        
+        inactive_entities = []
+        for row in rows:
+            entity_dict = dict(zip(cols, row))
+            if entity_dict['last_activity']:
+                entity_dict['last_activity'] = entity_dict['last_activity'].strftime("%Y-%m-%d %H:%M:%S")
+            inactive_entities.append(entity_dict)
+        
+        cur.close()
+        return inactive_entities
+    finally:
+        if conn:
+            release_main(conn)
 
 # ---------- MAIN QUERY FUNCTION ----------
 
 def entity_details(user_input):
-    conn_main = connect_main()
-    cur_main = conn_main.cursor()
+    conn_main = None
+    try:
+        conn_main = connect_main()
+        cur_main = conn_main.cursor()
 
-    resolved = resolve_entity(cur_main, user_input["identifier"])
-    if not resolved:
-        print("Entity not found")
-        return
-    return resolved
+        resolved = resolve_entity(cur_main, user_input["identifier"])
+        if not resolved:
+            print("Entity not found::")
+            return None
+        return resolved
+    finally:
+        if conn_main:
+            release_main(conn_main)
     
     
 
-def query_entity(user_input):
-    conn_main = connect_main()
-    cur_main = conn_main.cursor()
+def query_entity(user_input, save_to_disk=False):
+    """Query entity timeline data.
+    
+    Args:
+        user_input: dict with identifier, start_time, end_time, location
+        save_to_disk: if True, save CSV files and images to OUTPUT_DIR
+    
+    Returns:
+        dict with timeline data and images (in-memory)
+    """
+    conn_main = None
+    try:
+        conn_main = connect_main()
+        cur_main = conn_main.cursor()
 
-    resolved = resolve_entity(cur_main, user_input["identifier"])
-    if not resolved:
-        print("Entity not found")
-        return
-    entity_id = resolved["entity_id"]
-    print(f"Resolved to entity_id: {entity_id}")
+        resolved = resolve_entity(cur_main, user_input["identifier"])
+        if not resolved:
+            print("Entity not found :(")
+            return None
+        entity_id = resolved["entity_id"]
+        print(f"Resolved to entity_id: {entity_id}")
 
-    card_id = resolved.get("card_id")
-    device_hash = resolved.get("device_hash")
+        card_id = resolved.get("card_id")
+        device_hash = resolved.get("device_hash")
 
-    start_time = normalize_time_input(user_input["start_time"], True) if user_input["start_time"] else None
-    end_time   = normalize_time_input(user_input["end_time"], False) if user_input["end_time"] else None
+        start_time = normalize_time_input(user_input["start_time"], True) if user_input["start_time"] else None
+        end_time   = normalize_time_input(user_input["end_time"], False) if user_input["end_time"] else None
 
-    entity_dir = os.path.join(OUTPUT_DIR, f"entity_{entity_id}")
-    os.makedirs(entity_dir, exist_ok=True)
+        entity_dir = None
+        if save_to_disk:
+            entity_dir = os.path.join(OUTPUT_DIR, f"entity_{entity_id}")
+            os.makedirs(entity_dir, exist_ok=True)
 
-    for table, (id_field, time_field) in TABLES.items():
-        if id_field == "entity_id":
-            id_value = entity_id
-        elif id_field == "card_id":
-            if not card_id: continue
-            id_value = card_id
-        elif id_field == "device_hash":
-            if not device_hash: continue
-            id_value = device_hash
-        elif id_field == "face_id":
-            id_value = "F" + entity_id[1:]
-        else:
-            continue
+        # Collect data in-memory
+        data_dict = {}
+        for table, (id_field, time_field) in TABLES.items():
+            if id_field == "entity_id":
+                id_value = entity_id
+            elif id_field == "card_id":
+                if not card_id: continue
+                id_value = card_id
+            elif id_field == "device_hash":
+                if not device_hash: continue
+                id_value = device_hash
+            elif id_field == "face_id":
+                id_value = "F" + entity_id[1:]
+            else:
+                continue
 
-        df = query_table(cur_main, table, id_field, id_value, time_field, start_time, end_time, user_input["location"])
-        if not df.empty:
-            df.to_csv(os.path.join(entity_dir, f"{table}.csv"), index=False)
-            print(f"Saved {len(df)} rows from {table}")
+            df = query_table(cur_main, table, id_field, id_value, time_field, start_time, end_time, user_input["location"])
+            if not df.empty:
+                data_dict[table] = df
+                if save_to_disk and entity_dir:
+                    df.to_csv(os.path.join(entity_dir, f"{table}.csv"), index=False)
+                    print(f"Saved {len(df)} rows from {table}")
 
-    save_images(entity_id, entity_dir)
-    timeline_dict = build_timeline(entity_dir, entity_id, conn_main)
-
-    cur_main.close()
-    conn_main.close()
-    print(f"Finished. Data + timeline saved in {entity_dir}")
-    return timeline_dict
+        images = save_images(entity_id, entity_dir, save_to_disk=save_to_disk)
+        timeline_dict = build_timeline(entity_dir, entity_id, conn_main, save_to_disk=save_to_disk, data_dict=data_dict)
+        #print("Timeline built.", len(timeline_dict), "events found.")
+        cur_main.close()
+        if save_to_disk:
+            print(f"Finished. Data + timeline saved in {entity_dir}")
+        #print("Query complete.", timeline_dict)
+        return timeline_dict
+    finally:
+        if conn_main:
+            release_main(conn_main)
 
 # ---------- MAIN ----------
 if __name__ == "__main__":
     clear_output_folder()
     user_input = get_user_input()
-    query_entity(user_input)
+    query_entity(user_input, save_to_disk=True)

@@ -1,4 +1,3 @@
-// frontend/src/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
@@ -11,7 +10,7 @@ const ProtectedRoute = ({ children }) => {
       try {
         const res = await fetch("http://localhost:5000/auth/check", {
           method: "GET",
-          credentials: "include", // send cookie
+          credentials: "include",
         });
         if (!res.ok) throw new Error("Not authenticated");
         setAuthenticated(true);
@@ -25,7 +24,7 @@ const ProtectedRoute = ({ children }) => {
     checkAuth();
   }, []);
 
-  if (loading) return <p className="text-center mt-20">⏳ Checking authentication...</p>;
+  if (loading) return <p className="text-center mt-20">Checking authentication...</p>;
   if (!authenticated) return <Navigate to="/login" replace />;
 
   return children;

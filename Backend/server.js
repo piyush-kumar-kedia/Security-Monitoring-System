@@ -1,8 +1,8 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const cookieParser= require('cookie-parser');
-const connectDB = require('./config/mdb');
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import connectDB from './config/mdb.js';
 
 dotenv.config();
 
@@ -19,8 +19,11 @@ app.use(
 );      
 app.use(cookieParser());
 
-app.use('/api', require('./routes/api'));
-app.use('/auth', require('./routes/authRoutes.js'));
+import apiRoutes from './routes/api.js';
+import authRoutes from './routes/authRoutes.js';
+
+app.use('/api', apiRoutes);
+app.use('/auth', authRoutes);
 
 app.get('/',(req,res)=>{
     res.send("Server is running");

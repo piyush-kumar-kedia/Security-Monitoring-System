@@ -24,7 +24,7 @@ export default function SearchBar({ type, onSelect }) {
       setLoading(false);
     };
 
-    const delayDebounce = setTimeout(fetchResults, 300); // debounce
+    const delayDebounce = setTimeout(fetchResults, 300);
     return () => clearTimeout(delayDebounce);
   }, [query, type]);
 

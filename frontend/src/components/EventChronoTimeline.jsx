@@ -2,7 +2,7 @@ import React from "react";
 import { Chrono } from "react-chrono";
 
 const EventChronoTimeline = ({ timeline }) => {
-  // Transform your events into Chrono items
+  
   const items = timeline.map(event => ({
     title: new Date(event.timestamp).toLocaleString(),
     cardTitle: event.source.replace(/_/g, " ").toUpperCase(),

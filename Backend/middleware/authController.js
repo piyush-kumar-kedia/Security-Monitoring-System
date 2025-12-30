@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const User = require('../Models/User.js');
+import jwt from 'jsonwebtoken';
+import User from '../Models/User.js';
 
 const generateToken = (user) => {   //generating token
   return jwt.sign(
@@ -9,7 +9,7 @@ const generateToken = (user) => {   //generating token
   );
 };
 
-exports.authenticateToken = (req, res, next) => {  //verifying user
+export const authenticateToken = (req, res, next) => {  //verifying user
   const token = req.cookies.jwt;
 
   if (!token) {
@@ -28,7 +28,7 @@ exports.authenticateToken = (req, res, next) => {  //verifying user
 };
 
 
-exports.registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     const existingUser = await User.findOne({ email });
@@ -45,7 +45,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log('check1');
@@ -67,7 +67,7 @@ exports.loginUser = async (req, res) => {
 };
 
 // Logout Controller
-exports.logoutUser = async (req, res) => {
+export const logoutUser = async (req, res) => {
   try {
     // Clear the JWT cookie
     res.clearCookie("jwt", {

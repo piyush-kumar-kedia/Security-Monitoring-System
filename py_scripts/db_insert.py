@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from psycopg2 import pool
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -7,6 +8,23 @@ load_dotenv()
 
 
 DATA_DIR = 'data'
+
+# Connection pool
+_db_pool = None
+
+def _initialize_pool():
+    """Initialize connection pool on first use."""
+    global _db_pool
+    if _db_pool is None:
+        _db_pool = pool.SimpleConnectionPool(
+            minconn=1,
+            maxconn=5,
+            host=os.getenv("DB_MAIN_HOST"),
+            port=os.getenv("DB_MAIN_PORT"),
+            user=os.getenv("DB_MAIN_USER"),
+            password=os.getenv("DB_MAIN_PASSWORD"),
+            database=os.getenv("DB_MAIN_NAME")
+        )
 
 # Mapping of file names to table names
 FILE_TABLE_MAP = {
@@ -26,14 +44,14 @@ COLUMN_RENAMES = {
 }
 
 def get_connection():
-    db_config = {
-        'host': os.getenv("DB_MAIN_HOST"),
-        'port': os.getenv("DB_MAIN_PORT"),
-        'user': os.getenv("DB_MAIN_USER"),
-        'password': os.getenv("DB_MAIN_PASSWORD"),
-        'database': os.getenv("DB_MAIN_NAME")
-    }
-    return psycopg2.connect(**db_config)
+    """Get a connection from the database pool."""
+    _initialize_pool()
+    return _db_pool.getconn()
+
+def release_connection(conn):
+    """Return a connection to the database pool."""
+    if conn and _db_pool:
+        _db_pool.putconn(conn)
 
 def insert_dataframe(df, table_name, conn):
     cols = ','.join(df.columns)
@@ -59,18 +77,22 @@ def insert_dataframe(df, table_name, conn):
         print(f"First error for {table_name}: {first_error}")
 
 def main():
-    conn = get_connection()
-    for file_name, table_name in FILE_TABLE_MAP.items():
-        file_path = os.path.join(DATA_DIR, file_name)
-        if os.path.exists(file_path):
-            print(f'Inserting {file_name} into {table_name}...')
-            df = pd.read_csv(file_path)
-            # Rename columns if needed
-            if file_name in COLUMN_RENAMES:
-                df = df.rename(columns=COLUMN_RENAMES[file_name])
-            insert_dataframe(df, table_name, conn)
-    conn.close()
-    print('All data inserted into ethos database.')
+    conn = None
+    try:
+        conn = get_connection()
+        for file_name, table_name in FILE_TABLE_MAP.items():
+            file_path = os.path.join(DATA_DIR, file_name)
+            if os.path.exists(file_path):
+                print(f'Inserting {file_name} into {table_name}...')
+                df = pd.read_csv(file_path)
+                # Rename columns if needed
+                if file_name in COLUMN_RENAMES:
+                    df = df.rename(columns=COLUMN_RENAMES[file_name])
+                insert_dataframe(df, table_name, conn)
+        print('All data inserted into ethos database.')
+    finally:
+        if conn:
+            release_connection(conn)
 
 if __name__ == '__main__':
     main()

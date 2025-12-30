@@ -13,15 +13,12 @@ const AlertsPage = () => {
 
   const [entityTypeFilter, setEntityTypeFilter] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
-  const [filteredAlerts, setFilteredAlerts] = useState([]);
 
-  // --- DATA FETCHING ---
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/alerts/inactive");
         setAlerts(res.data.alerts);
-        setFilteredAlerts(res.data.alerts); 
       } catch (err) {
         console.error(err);
       } finally {
@@ -34,24 +31,13 @@ const AlertsPage = () => {
     }, 150); 
   }, []);
 
-  // --- FILTERING LOGIC ---
-  useEffect(() => {
-    let tempAlerts = alerts;
-
-    if (entityTypeFilter) {
-      tempAlerts = tempAlerts.filter(
-        (alert) => alert.role === entityTypeFilter
-      );
-    }
-
-    if (departmentFilter) {
-      tempAlerts = tempAlerts.filter(
-        (alert) => alert.department === departmentFilter
-      );
-    }
-
-    setFilteredAlerts(tempAlerts);
-  }, [entityTypeFilter, departmentFilter, alerts]);
+  const filteredAlerts = useMemo(() => {
+    return alerts.filter((alert) => {
+      if (entityTypeFilter && alert.role !== entityTypeFilter) return false;
+      if (departmentFilter && alert.department !== departmentFilter) return false;
+      return true;
+    });
+  }, [alerts, entityTypeFilter, departmentFilter]);
 
       const handleLogout = async () => {
     try {
@@ -92,7 +78,7 @@ const AlertsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar (Unchanged) */}
+      {/* Navbar */}
       <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md fixed top-0 w-full z-50">
               <h1 className="text-2xl font-bold">Campus Security-Monitoring-System</h1>
       
@@ -204,7 +190,7 @@ const AlertsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredAlerts.map((entity) => (
                     <div
-                      key={entity.card_id}
+                      key={entity.entity_id}
                       className="bg-white rounded-lg shadow-md p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-l-4 border-red-500"
                     >
                       <div className="flex justify-between items-start">

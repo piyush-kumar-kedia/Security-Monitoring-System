@@ -1,4 +1,3 @@
-// src/pages/TimelinePage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -37,8 +36,8 @@ const TimelinePage = () => {
         console.log("Fetching timeline for entityId:", entityId);
 
         const resTimeline = await axios.post("http://localhost:5000/api/run-script", { entityId });
-        setTimeline(resTimeline.data.timeline);
-
+        setTimeline(resTimeline.data.data);
+        console.log("Fetched timeline data:", resTimeline);
         const resEntity = await axios.get(`http://localhost:5000/api/entities/${entityId}`);
         setEntity(resEntity.data.details);
 
@@ -295,7 +294,7 @@ const TimelinePage = () => {
           </div>
         )}
 
-        {/* Predictor Section (Integrated) */}
+        {/* Predictor Section*/}
         <div className="bg-gradient-to-br from-purple-50 via-white to-indigo-50 rounded-2xl shadow-lg p-8 mb-12 border border-purple-100">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg">
@@ -579,20 +578,20 @@ const TimelinePage = () => {
           </div>
         ) : (
           <div className="relative">
-            {/* Timeline Line */}
+
             <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200"></div>
 
             <div className="space-y-8">
               {filteredTimeline.map((event, index) => (
                 <div key={event.event_id || index} className="relative pl-20">
-                  {/* Timeline Dot */}
+
                   <div className={`absolute left-5 top-6 w-7 h-7 rounded-full ${getSourceColor(event.source)} shadow-lg flex items-center justify-center text-white text-xs font-bold border-4 border-white`}>
                     {index + 1}
                   </div>
 
-                  {/* Event Card */}
+
                   <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group">
-                    {/* Card Header */}
+                    
                     <div className={`${getSourceColor(event.source)} px-6 py-4`}>
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">{getSourceIcon(event.source)}</span>
@@ -601,14 +600,12 @@ const TimelinePage = () => {
                         </h3>
                       </div>
                     </div>
-
-                    {/* Card Body */}
+                
                     <div className="p-6">
                       <p className="text-gray-700 text-base leading-relaxed mb-4">
                         {event.summary || "No additional details available"}
                       </p>
 
-                      {/* Meta Information */}
                       <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-100">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin size={16} className="text-purple-500" />

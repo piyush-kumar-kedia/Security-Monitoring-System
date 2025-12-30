@@ -1,19 +1,19 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
-const {Pool} = require('pg');
+import dotenv from 'dotenv';
+import pkg from 'pg';
+const {Pool} = pkg;
+
+dotenv.config();
 
 const pool = new Pool({
-
-  host: 'localhost',
-  database: 'entity_data',
-  user: 'postgres',
-  password: 'Jayansh@1523',
-  port: 5432,
+  host: process.env.DB_MAIN_HOST,
+  database: process.env.DB_MAIN_NAME,
+  user: process.env.DB_MAIN_USER,
+  password: process.env.DB_MAIN_PASSWORD,
+  port: process.env.DB_MAIN_PORT,
 });
 
-// Test connection
 pool.connect()
   .then(() => console.log("Connected to PostgreSQL"))
   .catch(err => console.error("Connection error", err.stack));
 
-module.exports = pool;
+export default pool;

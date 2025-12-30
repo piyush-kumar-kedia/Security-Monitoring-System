@@ -5,10 +5,7 @@ from datetime import datetime
 from glob import glob
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
-
 
 DATA_UPLOAD_DIR = 'data_upload'
 DATA_PROCESSED_DIR = 'data'

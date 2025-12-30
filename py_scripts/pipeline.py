@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-
 DB_USER = os.getenv("DB_MAIN_USER")
 DB_PASS = os.getenv("DB_MAIN_PASSWORD")
 DB_HOST = os.getenv("DB_MAIN_HOST")
@@ -57,6 +55,7 @@ def main():
     run_psql("postgres", "create_images_table.sql")
     run_python("db_insert.py")
     run_python("ingest_face_images.py")
+    run_python("run_create_indexes.py")
 
     print("\n Pipeline completed successfully!")
 

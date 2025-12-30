@@ -182,13 +182,9 @@ return (
         </div>
       )}
     <div className="max-w-7xl mx-auto p-6 mt-10">
-      {/* Header Section */}
       
       <div className="mb-8">
-        {/* Header */}
-      
 
-        {/* Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-sm font-medium">Total Entities</p>
@@ -233,7 +229,6 @@ return (
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            {/* Name Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
@@ -245,7 +240,6 @@ return (
               />
             </div>
 
-            {/* Roll Number Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
@@ -257,7 +251,6 @@ return (
               />
             </div>
 
-            {/* Category Filter */}
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <select
@@ -375,7 +368,7 @@ return (
         </div>
       </div>
 
-      {/* Enhanced Pagination */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-6 bg-white rounded-xl shadow-md p-4 border border-gray-100">
           <div className="flex items-center justify-between">
@@ -410,7 +403,6 @@ return (
                 <ChevronLeft size={20} />
               </button>
 
-              {/* Page Numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum;
                 if (totalPages <= 5) {
@@ -437,7 +429,6 @@ return (
                 );
               })}
 
-              {/* Next Page */}
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -449,7 +440,6 @@ return (
                 <ChevronRight size={20} />
               </button>
 
-              {/* Last Page */}
               <button
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages}

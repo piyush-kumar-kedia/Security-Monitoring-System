@@ -1,4 +1,3 @@
-// frontend/src/components/StatCardSkeleton.jsx
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';

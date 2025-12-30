@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { getTimeline, getAlerts, getAllEntities, runPythonScript, getEntity, predict, train } from '../Controller/MonitorController.js';
+
 const router = express.Router();
-const { getTimeline, getAlerts,  getAllEntities, runPythonScript, getEntity, predict, train } = require('../Controller/MonitorController.js');
 
 // Define the routes
 router.get('/timeline/:entityId', getTimeline);
@@ -12,4 +13,4 @@ router.post("/train", train)
 router.get('/entity',getAllEntities);
 
 
-module.exports = router;
+export default router;

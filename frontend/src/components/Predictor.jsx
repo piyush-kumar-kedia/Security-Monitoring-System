@@ -1,4 +1,3 @@
-// src/components/Predictor.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MapPin, Calendar, TrendingUp, AlertCircle, Loader } from "lucide-react";
@@ -15,7 +14,6 @@ function Predictor({ entityId }) {
     const [training, setTraining] = useState(false);
     const [trained, setTrained] = useState(false);
 
-    // Debug: Log entityId whenever it changes
     useEffect(() => {
         console.log("Predictor received entityId:", entityId);
         if (!entityId) {
@@ -45,7 +43,6 @@ function Predictor({ entityId }) {
     };
 
     const predictLocation = async (entityId, timestamp) => {
-        // Add validation
         if (!entityId) {
             throw new Error("Entity ID is required");
         }
@@ -65,7 +62,6 @@ function Predictor({ entityId }) {
     };
 
     const handlePredict = async () => {
-        // Validate entityId first
         if (!entityId) {
             setError("Entity ID is missing. Cannot make prediction.");
             return;
@@ -114,7 +110,6 @@ function Predictor({ entityId }) {
                 Predict where this entity is likely to be at a specific time based on historical patterns.
             </p>
 
-            {/* Debug Info - Remove in production */}
             <div className="text-xs text-gray-500 mb-4 p-2 bg-gray-100 rounded">
                 Entity ID: {entityId || "Not provided"}
             </div>

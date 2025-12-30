@@ -1,11 +1,9 @@
-// src/components/AlertCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AlertCard({ alert }) {
   const navigate = useNavigate();
 
-  // Color coding based on severity
   const severityColors = {
     high: "bg-red-100 text-red-800",
     medium: "bg-yellow-100 text-yellow-800",
