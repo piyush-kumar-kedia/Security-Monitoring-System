@@ -6,6 +6,7 @@ import TimelinePage from "./pages/TimelinePage";
 import EntitiesPage from "./pages/EntitiesPage";
 import Login from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Register from "./pages/RegisterPage";
 
 function App() {
@@ -34,9 +35,9 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin" element={
-            <ProtectedRoute>
+            <AdminProtectedRoute>
               <Register />
-            </ProtectedRoute>
+            </AdminProtectedRoute>
           }/>
       </Routes>
     </Router>

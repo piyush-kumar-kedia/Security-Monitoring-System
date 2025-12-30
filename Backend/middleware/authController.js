@@ -27,6 +27,13 @@ export const authenticateToken = (req, res, next) => {  //verifying user
   }
 };
 
+export const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: "Access denied. Admin role required." });
+  }
+  next();
+};
+
 
 export const registerUser = async (req, res) => {
   try {
