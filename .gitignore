@@ -1,9 +1,89 @@
+# Environment Variables
 .env
-py_scripts/output
-py_scripts/__pycache__
-frontend/node_modules
-frontend/.env
-Backend/.env
+.env.local
+.env.development
+.env.production
+*.env
 py_scripts/.env
-Backend/node_modules
-py_scripts/data
+Backend/.env
+frontend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+py_scripts/__pycache__/
+py_scripts/venv/
+py_scripts/env/
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+Backend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+frontend/dist/
+frontend/build/
+Backend/dist/
+Backend/build/
+
+# Data & Output
+py_scripts/data/
+py_scripts/data_upload/
+py_scripts/output/
+py_scripts/cached_data/
+*.csv
+*.sql
+
+# Images
+py_scripts/data/face_images/
+py_scripts/data_upload/face_images/
+py_scripts/output/*/images/
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+.pytest_cache/
