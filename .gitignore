@@ -6,3 +6,4 @@ frontend/.env
 Backend/.env
 py_scripts/.env
 Backend/node_modules
+py_scripts/data
