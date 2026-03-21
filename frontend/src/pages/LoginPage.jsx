@@ -7,7 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -17,16 +17,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage({ text: "", type: "" });
     try {
       await loginUser(form);
-      setMessage("Login successful! Redirecting...");
+      setMessage({ text: "Login successful. Redirecting...", type: "success" });
 
       setTimeout(() => {
         navigate("/");
       }, 1000);
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      setMessage({ text: err.message || "Login failed", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -73,12 +73,14 @@ const Login = () => {
               className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
             {/* Toggle Eye Icon */}
-            <div
+            <button
+              type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </div>
+            </button>
           </div>
 
           <button
@@ -90,13 +92,13 @@ const Login = () => {
           </button>
         </form>
 
-        {message && (
+        {message.text && (
           <p
             className={`mt-4 text-center font-medium ${
-              message.includes("❌") ? "text-red-600" : "text-green-600"
+              message.type === "error" ? "text-red-600" : "text-green-600"
             }`}
           >
-            {message}
+            {message.text}
           </p>
         )}
 

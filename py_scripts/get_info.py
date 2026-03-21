@@ -21,23 +21,14 @@ DB_MAIN = {
     "port": os.getenv("DB_MAIN_PORT"),
 }
 
-DB_IMAGES = {
-    "dbname": os.getenv("DB_IMAGES_NAME"),
-    "user": os.getenv("DB_IMAGES_USER"),
-    "password": os.getenv("DB_IMAGES_PASSWORD"),
-    "host": os.getenv("DB_IMAGES_HOST"),
-    "port": os.getenv("DB_IMAGES_PORT"),
-}
-
 OUTPUT_DIR = "output"
 
 # ---------- CONNECTION POOLS ----------
 _main_pool = None
-_images_pool = None
 
 def _initialize_pools():
     """Initialize connection pools on first use."""
-    global _main_pool, _images_pool
+    global _main_pool
     
     if _main_pool is None:
         _main_pool = pool.SimpleConnectionPool(
@@ -50,16 +41,6 @@ def _initialize_pools():
             database=os.getenv("DB_MAIN_NAME")
         )
     
-    if _images_pool is None:
-        _images_pool = pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=5,
-            host=os.getenv("DB_IMAGES_HOST"),
-            port=os.getenv("DB_IMAGES_PORT"),
-            user=os.getenv("DB_IMAGES_USER"),
-            password=os.getenv("DB_IMAGES_PASSWORD"),
-            database=os.getenv("DB_IMAGES_NAME")
-        )
 
 # Table identifier mapping: table -> (identifier field, timestamp field)
 TABLES = {
@@ -77,20 +58,10 @@ def connect_main():
     _initialize_pools()
     return _main_pool.getconn()
 
-def connect_images():
-    """Get a connection from the images database pool."""
-    _initialize_pools()
-    return _images_pool.getconn()
-
 def release_main(conn):
     """Return a connection to the main database pool."""
     if conn and _main_pool:
         _main_pool.putconn(conn)
-
-def release_images(conn):
-    """Return a connection to the images database pool."""
-    if conn and _images_pool:
-        _images_pool.putconn(conn)
 
 # ---------- OUTPUT FOLDER ----------
 def clear_output_folder():
@@ -161,37 +132,6 @@ def query_table(cur, table, id_field, id_value, time_field=None, start=None, end
         return pd.DataFrame()
     cols = [desc[0] for desc in cur.description]
     return pd.DataFrame(rows, columns=cols)
-
-# ---------- SAVE IMAGES ----------
-def save_images(entity_id, entity_dir=None, save_to_disk=True):
-    """Fetch images and optionally save to disk.
-    Returns: list of dicts with image_id and image_data
-    """
-    face_id = "F" + entity_id[1:]  # derive face_id
-    conn_img = None
-    try:
-        conn_img = connect_images()
-        cur_img = conn_img.cursor()
-        cur_img.execute("SELECT image_id, image_data FROM face_images WHERE image_id LIKE %s", (f"{face_id}%",))
-        rows = cur_img.fetchall()
-        
-        images = []
-        for image_id, image_data in rows:
-            images.append({"image_id": image_id, "image_data": image_data})
-            
-            if save_to_disk and entity_dir:
-                img_dir = os.path.join(entity_dir, "images")
-                os.makedirs(img_dir, exist_ok=True)
-                filename = image_id if image_id.lower().endswith(".jpg") else f"{image_id}.jpg"
-                with open(os.path.join(img_dir, filename), "wb") as f:
-                    f.write(image_data)
-        
-        if save_to_disk:
-            print(f"Saved {len(rows)} images for entity_id={entity_id} (face_id={face_id})")
-        return images
-    finally:
-        if conn_img:
-            release_images(conn_img)
 
 # ---------- BUILD TIMELINE ----------
 def build_timeline(entity_dir, entity_id, conn_main, save_to_disk=True, data_dict=None):
@@ -460,10 +400,10 @@ def query_entity(user_input, save_to_disk=False):
     
     Args:
         user_input: dict with identifier, start_time, end_time, location
-        save_to_disk: if True, save CSV files and images to OUTPUT_DIR
+        save_to_disk: if True, save CSV files to OUTPUT_DIR
     
     Returns:
-        dict with timeline data and images (in-memory)
+        timeline data (in-memory)
     """
     conn_main = None
     try:
@@ -511,7 +451,6 @@ def query_entity(user_input, save_to_disk=False):
                     df.to_csv(os.path.join(entity_dir, f"{table}.csv"), index=False)
                     print(f"Saved {len(df)} rows from {table}")
 
-        images = save_images(entity_id, entity_dir, save_to_disk=save_to_disk)
         timeline_dict = build_timeline(entity_dir, entity_id, conn_main, save_to_disk=save_to_disk, data_dict=data_dict)
         #print("Timeline built.", len(timeline_dict), "events found.")
         cur_main.close()

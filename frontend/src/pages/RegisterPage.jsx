@@ -9,9 +9,9 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "", 
+    role: "",
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -22,18 +22,18 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage({ text: "", type: "" });
 
     try {
       await registerUser(form); // JWT cookie set automatically
-      setMessage("✅ Registration successful! Logging in...");
+      setMessage({ text: "Registration successful. Logging in...", type: "success" });
 
       // Redirect to home
       setTimeout(() => {
         navigate("/");
       }, 1000);
     } catch (err) {
-      setMessage(err.message || "❌ Registration failed");
+      setMessage({ text: err.message || "Registration failed", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -86,12 +86,14 @@ const Register = () => {
             required
             className="w-full outline-none p-2 pr-10"
           />
-          <div
+          <button
+            type="button"
             className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </div>
+          </button>
         </div>
 
         {/* Role Dropdown */}
@@ -122,15 +124,13 @@ const Register = () => {
         </button>
       </form>
 
-      {message && (
+      {message.text && (
         <p
           className={`mt-5 text-center font-medium ${
-            message.includes("Error") || message.includes("❌")
-              ? "text-red-600"
-              : "text-green-600"
+            message.type === "error" ? "text-red-600" : "text-green-600"
           }`}
         >
-          {message}
+          {message.text}
         </p>
       )}
     </div>

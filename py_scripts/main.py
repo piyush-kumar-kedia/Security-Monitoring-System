@@ -1,13 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from get_info import query_entity, entity_details, check_inactive_entities, clear_output_folder
+from get_info import query_entity, entity_details, check_inactive_entities
 from prediction_pipeline import CampusLocationPredictor
 import pandas as pd
-import uvicorn
 import numpy as np
-from fastapi.encoders import jsonable_encoder
 import threading
-import base64
 
 app = FastAPI()
 
@@ -38,12 +35,6 @@ def to_serializable(obj):
     # Check for None first
     if obj is None:
         return None
-    # Handle bytes (e.g., image data)
-    elif isinstance(obj, bytes):
-        return base64.b64encode(obj).decode('utf-8')
-    # Handle memoryview (sometimes returned from postgres)
-    elif isinstance(obj, memoryview):
-        return base64.b64encode(obj.tobytes()).decode('utf-8')
     # Check collections before scalar checks
     elif isinstance(obj, dict):
         return {k: to_serializable(v) for k, v in obj.items()}
@@ -75,33 +66,33 @@ def run_query(input: QueryInput):
         "end_time": input.end_time,
         "location": input.location
     }
-    #print("Received query:", user_input)
+    print(f"[DEBUG] Received /run-query request: {user_input}")
     result = query_entity(user_input, save_to_disk=False)
-    #print("Query result obtained.", result)
+
     if result is None:
-        print("Oops :(")
+        print(f"[WARN] /run-query: entity not found for input: {user_input}")
         raise HTTPException(status_code=404, detail="Entity not found::()")
     
     # Clean the result to ensure JSON serialization
-    print("Cleaning result for serialization...")
     clean_result = to_serializable(result)
-    print("Result", result)
-    return {"status": "success", "data": result}
+    print("[DEBUG] /run-query success: serialized result prepared")
+    return {"status": "success", "data": clean_result}
 
 @app.post("/details")
 def details(input: QueryInput):
     user_input = {
         "identifier": {input.identifier_type: input.identifier_value},
     }
-    print("Received details request:", user_input)
+    print(f"[DEBUG] Received /details request: {user_input}")
     result = entity_details(user_input)
-    print("Details result", result)
+    print("[DEBUG] /details success")
     return {"status": "success", "details": result}
 
 
 @app.post("/train")
 def train_model(req: TrainRequest):
     global predictor
+    print(f"[DEBUG] Received /train request: {req.model_dump()}")
     with predictor_lock:
         predictor = CampusLocationPredictor(
             data_dir=req.data_dir,
@@ -115,8 +106,10 @@ def train_model(req: TrainRequest):
             predictor.temporal_aggregation()
             predictor.build_feature_matrix_and_cluster()
             predictor.build_cluster_prob_table()
+            print("[INFO] /train success: model trained")
             return {"status": "success", "message": "Model trained successfully!"}
         except Exception as e:
+            print(f"[ERROR] /train failed: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -126,13 +119,16 @@ def predict_location(req: PredictRequest):
     Predicts the most probable location for a given entity and timestamp.
     """
     global predictor
+    print(f"[DEBUG] Received /predict request: entity_id={req.entity_id} timestamp={req.timestamp}")
     with predictor_lock:
         if predictor is None:
+            print("[WARN] /predict called before model training")
             raise HTTPException(status_code=400, detail="Model not trained yet. Call /train first.")
 
         try:
             result = predictor.predict_location(req.entity_id, req.timestamp)
             clean_result = to_serializable(result)
+            print("[DEBUG] /predict success")
 
             return {
                 "entity_id": req.entity_id,
@@ -140,15 +136,19 @@ def predict_location(req: PredictRequest):
                 **clean_result
             }
         except Exception as e:
+            print(f"[ERROR] /predict failed: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
 @app.get("/alerts/inactive")
 def get_inactive_alerts():
     try:
+        print("[DEBUG] Received /alerts/inactive request")
         inactive = check_inactive_entities()
+        print(f"[DEBUG] /alerts/inactive success: count={len(inactive)}")
         return {"status": "success", "alerts": inactive, "count": len(inactive)}
     except Exception as e:
+        print(f"[ERROR] /alerts/inactive failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch alerts: {str(e)}")
 
 

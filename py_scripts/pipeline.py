@@ -44,17 +44,7 @@ def main():
     run_python("profile_preprocess.py")
     run_python("ingest_and_preprocess.py")
     run_psql("postgres", "create_tables.sql")
-    print("\nEnsuring ethos_images database exists ...")
-    subprocess.run(
-        [
-            "psql", "-h", DB_HOST, "-p", DB_PORT, "-U", DB_USER,
-            "-d", "postgres", "-c", "CREATE DATABASE ethos_images;"
-        ],
-        env={**os.environ, "PGPASSWORD": DB_PASS}
-    )
-    run_psql("postgres", "create_images_table.sql")
     run_python("db_insert.py")
-    run_python("ingest_face_images.py")
     run_python("run_create_indexes.py")
 
     print("\n Pipeline completed successfully!")

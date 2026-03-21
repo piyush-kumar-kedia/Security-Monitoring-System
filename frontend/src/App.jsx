@@ -5,8 +5,8 @@ import AlertsPage from "./pages/AlertsPage";
 import TimelinePage from "./pages/TimelinePage";
 import EntitiesPage from "./pages/EntitiesPage";
 import Login from "./pages/LoginPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import ProtectedRoute from "./guards/ProtectedRoute";
+import AdminProtectedRoute from "./guards/AdminProtectedRoute";
 import Register from "./pages/RegisterPage";
 
 function App() {

@@ -57,7 +57,7 @@ The **Security Monitoring System** is a comprehensive full-stack application des
 │  • Entity resolution pipeline with clustering               │
 │  • ML-based location prediction engine                      │
 │  • Timeline generation and event aggregation                │
-│  • Face embedding processing and comparison                 │
+│  • Cross-source timeline aggregation and analytics          │
 └──────────────────────┬──────────────────────────────────────┘
                        │ SQL Queries
                        ▼
@@ -65,7 +65,7 @@ The **Security Monitoring System** is a comprehensive full-stack application des
 │                   Data Storage Layer                        │
 │  • PostgreSQL: Activity logs, timelines, embeddings         │
 │  • MongoDB: User accounts, sessions, preferences            │
-│  • File System: CCTV frames and face images                 │
+│  • File System: processed tabular datasets and outputs      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -125,12 +125,6 @@ DB_MAIN_USER=user
 DB_MAIN_PASSWORD=password
 DB_MAIN_HOST=localhost
 DB_MAIN_PORT=5432
-
-DB_IMAGES_NAME=name
-DB_IMAGES_USER=user
-DB_IMAGES_PASSWORD=password
-DB_IMAGES_HOST=localhost
-DB_IMAGES_PORT=5432
 ```
 
 **Backend/.env**
@@ -197,8 +191,7 @@ DB_MAIN_PORT=5432
 - **wifi_associations**: Network connection records with MAC addresses
 - **library_checkouts**: Book borrowing history and timestamps
 - **lab_bookings**: Laboratory reservation data with time slots
-- **cctv_frames**: Video surveillance metadata with image references
-- **face_embeddings**: Facial recognition vectors for identity matching
+- **cctv_frames**: Video surveillance metadata for timeline events
 - **free_text_notes**: Helpdesk tickets and RSVP text data
 
 ### Performance Optimization
@@ -212,7 +205,7 @@ DB_MAIN_PORT=5432
 
 ### Entity Resolution Algorithm
 - **Clustering Approach**: DBSCAN and Agglomerative Clustering for grouping related records
-- **Multi-Modal Matching**: Combines student IDs, WiFi MAC addresses, and face embeddings
+- **Multi-Source Matching**: Combines student IDs, card IDs, and WiFi device hashes
 - **Features**: Temporal correlation (time proximity), spatial proximity (location overlap), and identifier matching
 - **Confidence Scoring**: Probabilistic matching with configurable thresholds for entity linkage
 
