@@ -81,6 +81,14 @@ The **Security Monitoring System** is a comprehensive full-stack application des
 
 ---
 
+## 📦 Dataset
+
+The dataset used for this project is available on Google Drive:
+
+- https://drive.google.com/drive/folders/1NfJZDLqRNQ5OHZ3I8k9vxU9gkMLw4RQl?usp=sharing
+
+---
+
 ## 🚀 Installation
 
 **Prerequisites:** Node.js (v18+), Python (3.11+), PostgreSQL (v14+), MongoDB (v6+)
