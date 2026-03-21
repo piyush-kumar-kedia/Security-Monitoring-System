@@ -49,15 +49,6 @@ py_scripts/cached_data/
 *.csv
 *.sql
 
-# Images
-py_scripts/data/face_images/
-py_scripts/data_upload/face_images/
-py_scripts/output/*/images/
-*.jpg
-*.jpeg
-*.png
-*.gif
-
 # IDE & Editors
 .vscode/
 .idea/

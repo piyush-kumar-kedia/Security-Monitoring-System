@@ -26,9 +26,6 @@ CREATE INDEX idx_campus_card_swipes_card_ts ON campus_card_swipes(card_id, times
 CREATE INDEX idx_wifi_logs_device_ts ON wifi_associations_logs(device_hash, timestamp DESC);
 CREATE INDEX idx_cctv_frames_face_ts ON cctv_frames(face_id, timestamp DESC);
 
--- Pattern index for image LIKE queries
-CREATE INDEX idx_face_images_pattern ON face_images(image_id text_pattern_ops);
-
 -- Update statistics
 ANALYZE campus_card_swipes;
 ANALYZE cctv_frames;
