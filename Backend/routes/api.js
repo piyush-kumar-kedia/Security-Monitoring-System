@@ -1,7 +1,10 @@
 import express from 'express';
 import { getTimeline, getAlerts, getAllEntities, runPythonScript, getEntity, predict, train } from '../Controller/MonitorController.js';
+import { authenticateToken } from '../middleware/authController.js';
 
 const router = express.Router();
+
+router.use(authenticateToken);
 
 // Define the routes
 router.get('/timeline/:entityId', getTimeline);

@@ -17,7 +17,7 @@ const AlertsPage = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/alerts/inactive");
+        const res = await axios.get("/api/alerts/inactive");
         setAlerts(res.data.alerts);
       } catch (err) {
         console.error(err);
@@ -41,7 +41,7 @@ const AlertsPage = () => {
 
       const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/auth/logout", {
+      const res = await fetch("/auth/logout", {
         method: "POST",
         credentials: "include",
       });

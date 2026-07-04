@@ -66,16 +66,16 @@ def run_query(input: QueryInput):
         "end_time": input.end_time,
         "location": input.location
     }
-    print(f"[DEBUG] Received /run-query request: {user_input}")
+    print(f"Received /run-query request: {user_input}")
     result = query_entity(user_input, save_to_disk=False)
 
     if result is None:
-        print(f"[WARN] /run-query: entity not found for input: {user_input}")
+        print(f"/run-query: entity not found for input: {user_input}")
         raise HTTPException(status_code=404, detail="Entity not found::()")
     
     # Clean the result to ensure JSON serialization
     clean_result = to_serializable(result)
-    print("[DEBUG] /run-query success: serialized result prepared")
+    print(f"/run-query success: serialized result prepared")
     return {"status": "success", "data": clean_result}
 
 @app.post("/details")
@@ -83,16 +83,16 @@ def details(input: QueryInput):
     user_input = {
         "identifier": {input.identifier_type: input.identifier_value},
     }
-    print(f"[DEBUG] Received /details request: {user_input}")
+    print(f"Received /details request: {user_input}")
     result = entity_details(user_input)
-    print("[DEBUG] /details success")
+    print(f"/details success: {result}")
     return {"status": "success", "details": result}
 
 
 @app.post("/train")
 def train_model(req: TrainRequest):
     global predictor
-    print(f"[DEBUG] Received /train request: {req.model_dump()}")
+    print(f"Received /train request: {req.model_dump()}")
     with predictor_lock:
         predictor = CampusLocationPredictor(
             data_dir=req.data_dir,
@@ -106,10 +106,10 @@ def train_model(req: TrainRequest):
             predictor.temporal_aggregation()
             predictor.build_feature_matrix_and_cluster()
             predictor.build_cluster_prob_table()
-            print("[INFO] /train success: model trained")
+            print(f"/train success: model trained")
             return {"status": "success", "message": "Model trained successfully!"}
         except Exception as e:
-            print(f"[ERROR] /train failed: {str(e)}")
+            print(f"/train failed: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -119,16 +119,16 @@ def predict_location(req: PredictRequest):
     Predicts the most probable location for a given entity and timestamp.
     """
     global predictor
-    print(f"[DEBUG] Received /predict request: entity_id={req.entity_id} timestamp={req.timestamp}")
+    print(f"Received /predict request: entity_id={req.entity_id} timestamp={req.timestamp}")
     with predictor_lock:
         if predictor is None:
-            print("[WARN] /predict called before model training")
+            print(f"/predict called before model training")
             raise HTTPException(status_code=400, detail="Model not trained yet. Call /train first.")
 
         try:
             result = predictor.predict_location(req.entity_id, req.timestamp)
             clean_result = to_serializable(result)
-            print("[DEBUG] /predict success")
+            print(f"/predict success: {clean_result}")
 
             return {
                 "entity_id": req.entity_id,
@@ -136,19 +136,19 @@ def predict_location(req: PredictRequest):
                 **clean_result
             }
         except Exception as e:
-            print(f"[ERROR] /predict failed: {str(e)}")
+            print(f"/predict failed: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
 @app.get("/alerts/inactive")
 def get_inactive_alerts():
     try:
-        print("[DEBUG] Received /alerts/inactive request")
+        print(f"Received /alerts/inactive request")
         inactive = check_inactive_entities()
-        print(f"[DEBUG] /alerts/inactive success: count={len(inactive)}")
+        print(f"/alerts/inactive success: count={len(inactive)}")
         return {"status": "success", "alerts": inactive, "count": len(inactive)}
     except Exception as e:
-        print(f"[ERROR] /alerts/inactive failed: {str(e)}")
+        print(f"/alerts/inactive failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch alerts: {str(e)}")
 
 
