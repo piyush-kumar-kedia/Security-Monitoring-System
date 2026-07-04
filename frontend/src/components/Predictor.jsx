@@ -25,7 +25,7 @@ function Predictor({ entityId }) {
         setTraining(true);
         setError(null);
         try {
-            const res = await axios.post("http://localhost:5000/api/train", {
+            const res = await axios.post("/api/train", {
                 data_dir: "data",
                 time_window_hours: 2,
                 n_clusters: null,
@@ -50,7 +50,7 @@ function Predictor({ entityId }) {
         console.log('Predicting for EntityId:', entityId, 'at timestamp:', timestamp);
         
         try {
-            const res = await axios.post("http://localhost:5000/api/predict", {
+            const res = await axios.post("/api/predict", {
                 entity_id: entityId,
                 timestamp: timestamp,
             });

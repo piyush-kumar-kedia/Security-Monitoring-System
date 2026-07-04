@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/auth/check", {
+        const res = await fetch("/auth/check", {
           method: "GET",
           credentials: "include",
         });

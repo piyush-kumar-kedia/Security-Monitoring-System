@@ -35,10 +35,10 @@ const TimelinePage = () => {
         setLoading(true);
         console.log("Fetching timeline for entityId:", entityId);
 
-        const resTimeline = await axios.post("http://localhost:5000/api/run-script", { entityId });
+        const resTimeline = await axios.post("/api/run-script", { entityId });
         setTimeline(resTimeline.data.data);
         console.log("Fetched timeline data:", resTimeline);
-        const resEntity = await axios.get(`http://localhost:5000/api/entities/${entityId}`);
+        const resEntity = await axios.get(`/api/entities/${entityId}`);
         setEntity(resEntity.data.details);
 
       } catch (err) {
@@ -69,7 +69,7 @@ const TimelinePage = () => {
 
     const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/auth/logout", {
+      const res = await fetch("/auth/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -94,7 +94,7 @@ const TimelinePage = () => {
     setTraining(true);
     setPredictionError(null);
     try {
-      const res = await axios.post("http://localhost:5000/api/train", {
+      const res = await axios.post("/api/train", {
         data_dir: "data",
         time_window_hours: 2,
         n_clusters: null,
@@ -119,7 +119,7 @@ const TimelinePage = () => {
     console.log('Predicting for EntityId:', entityId, 'at timestamp:', timestamp);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/predict", {
+      const res = await axios.post("/api/predict", {
         entity_id: entityId,
         timestamp: timestamp,
       });

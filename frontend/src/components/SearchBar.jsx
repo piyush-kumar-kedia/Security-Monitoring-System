@@ -15,7 +15,9 @@ export default function SearchBar({ type, onSelect }) {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/search?type=${type}&query=${query}`);
+        const res = await fetch(`/api/search?type=${type}&query=${query}`, {
+          credentials: "include",
+        });
         const data = await res.json();
         setResults(data);
       } catch (err) {

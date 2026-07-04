@@ -39,7 +39,7 @@ const EntitiesPage = () => {
     const fetchEntities = async () => {
       try {
         console.log("Fetching entities...");
-        const res = await axios.get("http://localhost:5000/api/entity");
+        const res = await axios.get("/api/entity");
         setEntities(res.data);
         console.log(res.data);
       } catch (err) {
@@ -52,7 +52,7 @@ const EntitiesPage = () => {
   const fetchTimeline = async (entityId) => {
     if (timelines[entityId]) return timelines[entityId];
     try {
-      const res = await axios.get(`http://localhost:5000/api/timeline/${entityId}`);
+      const res = await axios.get(`/api/timeline/${entityId}`);
       const timelineEvents = res.data.timeline || [];
       setTimelines((prev) => ({ ...prev, [entityId]: timelineEvents }));
       return timelineEvents;
@@ -133,7 +133,7 @@ const clearAllFilters = () => {
 
 const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/auth/logout", {
+      const res = await fetch("/auth/logout", {
         method: "POST",
         credentials: "include",
       });

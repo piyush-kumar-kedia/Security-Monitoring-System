@@ -9,7 +9,7 @@ const AdminProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAdminAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/auth/check-admin", {
+        const res = await fetch("/auth/check-admin", {
           method: "GET",
           credentials: "include",
         });

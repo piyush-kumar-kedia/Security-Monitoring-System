@@ -30,8 +30,8 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const [entitiesRes, alertsRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/entity"),
-          axios.get("http://localhost:5000/api/alerts/inactive"),
+          axios.get("/api/entity"),
+          axios.get("/api/alerts/inactive"),
         ]);
         console.log('entities: ', entitiesRes);
         setEntities(entitiesRes.data || []);
@@ -103,7 +103,7 @@ const HomePage = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/auth/logout", {
+      const res = await fetch("/auth/logout", {
         method: "POST",
         credentials: "include",
       });
